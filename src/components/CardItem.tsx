@@ -1,4 +1,4 @@
-import {Box, HStack, Image, Pressable, Text, VStack} from 'native-base';
+import { Box, HStack, Image, Pressable, Text, VStack } from 'native-base';
 import React from 'react';
 
 type AuthorType = {
@@ -48,7 +48,7 @@ const CardItem: React.FC<CardItemType> = ({
             </Text>
             <HStack alignItems="center" space="2" justifyContent="flex-end">
               <Image
-                source={require('../../assets/sol_balance.png')}
+                source={require('../assets/sol_balance.png')}
                 alt={author.name}
                 w={6}
                 h={6}

@@ -1,6 +1,9 @@
-import {Routers} from '@/constants/Routers';
-import {BottomTabNavigationOptions, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import React from 'react';
+import { Routers } from '@/constants/Routers';
+import {
+  BottomTabNavigationOptions,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
+import React, { ComponentProps } from 'react';
 import MyTabBar from './MyTabar';
 import HomeScreen from '@/app/home/Home';
 import OnboardingScreen from '@/app/onboarding/Onboarding';
@@ -10,9 +13,13 @@ const tabarOption: BottomTabNavigationOptions = {
   headerShown: false,
 };
 
+const tabBar: ComponentProps<(typeof MainTabStack)['Navigator']>['tabBar'] = props => (
+  <MyTabBar {...props} />
+);
+
 const MainTabScreen: React.FC = () => {
   return (
-    <MainTabStack.Navigator screenOptions={tabarOption} tabBar={props => <MyTabBar {...props} />}>
+    <MainTabStack.Navigator screenOptions={tabarOption} tabBar={tabBar}>
       <MainTabStack.Screen name={Routers.OnboardingScreen} component={HomeScreen} />
       <MainTabStack.Screen name={'sdfasd'} component={OnboardingScreen} />
       <MainTabStack.Screen name={'sdfasddfds'} component={OnboardingScreen} />

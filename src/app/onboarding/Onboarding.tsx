@@ -7,8 +7,8 @@ import { Box, Image, Text, VStack } from 'native-base';
 import React, { PropsWithChildren, useCallback, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 
-import background from '../../../assets/background.png';
-import solIcon from '../../../assets/sol_icon.png';
+import background from '../../assets/background.png';
+import solIcon from '../../assets/sol_icon.png';
 
 const OnboardingScreen: React.FC<PropsWithChildren> = () => {
   const { navigate } = useMyNavigation();
@@ -26,7 +26,7 @@ const OnboardingScreen: React.FC<PropsWithChildren> = () => {
 
   return (
     <Box h="100%" position="relative" backgroundColor="black">
-      <Image source={background} alt="solclan" resizeMode="cover" />
+      <Image width="100%" height="80%" source={background} alt="solclan" resizeMode="cover" />
       <Box position="absolute" bottom="0" width="100%" height="40%">
         <VStack
           position="relative"

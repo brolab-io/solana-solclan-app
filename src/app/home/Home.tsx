@@ -1,12 +1,13 @@
-import React, {PropsWithChildren, useCallback} from 'react';
-import {ScrollView, VStack} from 'native-base';
-import ButtonTab, {ButtonType} from '@/components/ButtonTab';
+import React, { PropsWithChildren, useCallback } from 'react';
+import { ScrollView, VStack } from 'native-base';
+import ButtonTab, { ButtonType } from '@/components/ButtonTab';
 import CardItems from '@/components/CardItems';
-import {CardItemType} from '@/components/CardItem';
+import { CardItemType } from '@/components/CardItem';
 import Header from '@/components/Header';
 import Layout from '@/components/Layout';
-import {useMyNavigation} from '@/navigator/Navigation';
-import {Routers} from '@/constants/Routers';
+import { useMyNavigation } from '@/navigator/Navigation';
+import { Routers } from '@/constants/Routers';
+import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 
 const tabData: ButtonType[] = [
   {
@@ -41,14 +42,17 @@ const cardData: CardItemType[] = [
     currentPrice: 100,
   },
 ];
+const bottomEdge: Edge[] = ['bottom'];
+const stickyHeaderIndices = [0];
+
 const HomeScreen: React.FC<PropsWithChildren> = () => {
-  const {navigate} = useMyNavigation();
+  const { navigate } = useMyNavigation();
 
   const [selected, setSelected] = React.useState(0);
 
   const itemPress = useCallback(
     (item: CardItemType) => {
-      navigate(Routers.ClanDetailScreen, {item});
+      navigate(Routers.ClanDetailScreen, { item });
     },
     [navigate],
   );
@@ -57,11 +61,13 @@ const HomeScreen: React.FC<PropsWithChildren> = () => {
     <Layout>
       <VStack h="100%" pb="24" backgroundColor="transparent">
         <Header title="SOLCLAN" />
-        <ScrollView>
-          <VStack px="5">
-            <ButtonTab data={tabData} selected={selected} tabSelected={setSelected} />
-            <CardItems data={cardData} onPress={itemPress} />
-          </VStack>
+        <ScrollView stickyHeaderIndices={stickyHeaderIndices}>
+          <ButtonTab mx="5" data={tabData} selected={selected} tabSelected={setSelected} />
+          <SafeAreaView edges={bottomEdge}>
+            <VStack px="5">
+              <CardItems data={cardData} onPress={itemPress} />
+            </VStack>
+          </SafeAreaView>
         </ScrollView>
       </VStack>
     </Layout>
