@@ -13,21 +13,24 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {queryClient} from './config/query.client';
 import {NavigationContainer} from '@react-navigation/native';
 import {AppNavigator} from './src/navigator/Navigation';
+import {SolanaProvider} from '@/lib/solana';
 
 const App: React.FC = () => {
   return (
-    <NavigationContainer>
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.AndroidSafeArea}>
-          <StatusBar
-            translucent={true}
-            backgroundColor={'transparent'}
-            barStyle={'light-content'}
-          />
-          <AppNavigator />
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </NavigationContainer>
+    <SolanaProvider>
+      <NavigationContainer>
+        <SafeAreaProvider>
+          <SafeAreaView style={styles.AndroidSafeArea}>
+            <StatusBar
+              translucent={true}
+              backgroundColor={'transparent'}
+              barStyle={'light-content'}
+            />
+            <AppNavigator />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </NavigationContainer>
+    </SolanaProvider>
   );
 };
 

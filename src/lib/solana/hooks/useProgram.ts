@@ -1,0 +1,89 @@
+import { useCallback, useMemo } from "react";
+import useConnection from "./useConnection";
+import { Program, AnchorProvider, Idl } from "@project-serum/anchor";
+import usePublicKey from "./usePublicKey";
+import { encode } from "bs58";
+import { onSignAllTransactionsRedirectLink, onSignTransactionRedirectLink } from "../constants/URL";
+import { buildUrl, encryptPayload } from "../utils";
+import { openURL } from "expo-linking";
+import { PublicKey, Transaction } from "@solana/web3.js";
+import useDAppKeypair from "./useDAppKeypair";
+import useSession from "./useSession";
+import useSharedSecret from "./useSharedSecret";
+import useSignTransaction from "./useSignTransaction";
+
+const useProgram = <T extends Idl>(idl: T, programID: string) => {
+  const connection = useConnection();
+  const publicKey = usePublicKey();
+  const dappKeyPair = useDAppKeypair();
+  const session = useSession();
+  const sharedSecret = useSharedSecret();
+  const signTransaction = useSignTransaction();
+
+  const signAllTransactions = useCallback(
+    async (transactions: Transaction[]) => {
+      console.log("signAllTransactions");
+      if (!sharedSecret) {
+        throw new Error("missing shared secret");
+      }
+
+      const serializedTransactions = transactions.map((t) =>
+        encode(
+          t.serialize({
+            requireAllSignatures: false,
+          })
+        )
+      );
+
+      const payload = {
+        session,
+        transactions: serializedTransactions,
+      };
+
+      const [nonce, encryptedPayload] = encryptPayload(payload, sharedSecret);
+
+      const params = new URLSearchParams({
+        dapp_encryption_public_key: encode(dappKeyPair.publicKey),
+        nonce: encode(nonce),
+        redirect_link: onSignAllTransactionsRedirectLink,
+        payload: encode(encryptedPayload),
+      });
+
+      const url = buildUrl("signAllTransactions", params);
+      openURL(url);
+
+      return transactions;
+    },
+    [sharedSecret, dappKeyPair.publicKey, session]
+  );
+
+  return useMemo(() => {
+    if (!publicKey) {
+      return {
+        program: null,
+        provider: null,
+        signAllTransactions,
+        signTransaction,
+      };
+    }
+    const provider = new AnchorProvider(
+      connection,
+      {
+        publicKey,
+        signAllTransactions,
+        signTransaction,
+      },
+      { commitment: "processed" }
+    );
+    // console.log("provider", provider);
+
+    const program = new Program(idl, new PublicKey(programID), provider);
+
+    return {
+      program,
+      provider,
+    };
+  }, [publicKey, signAllTransactions, signTransaction]);
+};
+
+export default useProgram;
