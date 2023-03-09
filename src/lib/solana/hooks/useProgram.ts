@@ -1,16 +1,15 @@
-import { useCallback, useMemo } from "react";
-import useConnection from "./useConnection";
-import { Program, AnchorProvider, Idl } from "@project-serum/anchor";
-import usePublicKey from "./usePublicKey";
-import { encode } from "bs58";
-import { onSignAllTransactionsRedirectLink, onSignTransactionRedirectLink } from "../constants/URL";
-import { buildUrl, encryptPayload } from "../utils";
-import { openURL } from "expo-linking";
-import { PublicKey, Transaction } from "@solana/web3.js";
-import useDAppKeypair from "./useDAppKeypair";
-import useSession from "./useSession";
-import useSharedSecret from "./useSharedSecret";
-import useSignTransaction from "./useSignTransaction";
+import { useCallback, useMemo } from 'react';
+import useConnection from './useConnection';
+import { Program, AnchorProvider, Idl } from '@project-serum/anchor';
+import usePublicKey from './usePublicKey';
+import { encode } from 'bs58';
+import { onSignAllTransactionsRedirectLink } from '../constants/URL';
+import { buildUrl, encryptPayload, Linking } from '../utils';
+import { PublicKey, Transaction } from '@solana/web3.js';
+import useDAppKeypair from './useDAppKeypair';
+import useSession from './useSession';
+import useSharedSecret from './useSharedSecret';
+import useSignTransaction from './useSignTransaction';
 
 const useProgram = <T extends Idl>(idl: T, programID: string) => {
   const connection = useConnection();
@@ -22,17 +21,17 @@ const useProgram = <T extends Idl>(idl: T, programID: string) => {
 
   const signAllTransactions = useCallback(
     async (transactions: Transaction[]) => {
-      console.log("signAllTransactions");
+      console.log('signAllTransactions');
       if (!sharedSecret) {
-        throw new Error("missing shared secret");
+        throw new Error('missing shared secret');
       }
 
-      const serializedTransactions = transactions.map((t) =>
+      const serializedTransactions = transactions.map(t =>
         encode(
           t.serialize({
             requireAllSignatures: false,
-          })
-        )
+          }),
+        ),
       );
 
       const payload = {
@@ -49,12 +48,12 @@ const useProgram = <T extends Idl>(idl: T, programID: string) => {
         payload: encode(encryptedPayload),
       });
 
-      const url = buildUrl("signAllTransactions", params);
-      openURL(url);
+      const url = buildUrl('signAllTransactions', params);
+      await Linking.openURL(url);
 
       return transactions;
     },
-    [sharedSecret, dappKeyPair.publicKey, session]
+    [sharedSecret, dappKeyPair.publicKey, session],
   );
 
   return useMemo(() => {
@@ -73,7 +72,7 @@ const useProgram = <T extends Idl>(idl: T, programID: string) => {
         signAllTransactions,
         signTransaction,
       },
-      { commitment: "processed" }
+      { commitment: 'processed' },
     );
     // console.log("provider", provider);
 
@@ -83,7 +82,7 @@ const useProgram = <T extends Idl>(idl: T, programID: string) => {
       program,
       provider,
     };
-  }, [publicKey, signAllTransactions, signTransaction]);
+  }, [connection, idl, programID, publicKey, signAllTransactions, signTransaction]);
 };
 
 export default useProgram;

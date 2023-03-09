@@ -13,9 +13,10 @@ import {
   StackNavigationProp,
   TransitionPresets,
 } from '@react-navigation/stack';
-import {Routers} from '../constants/Routers';
+import { Routers } from '../constants/Routers';
 import IntroScreen from '../app/onboarding/Onboarding';
 import MainTabScreen from './TabNavigation';
+import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 
 const AppStack = createStackNavigator<MyParamList>();
 
@@ -65,8 +66,10 @@ const AppRouters: MyRouteConfig[] = [
 ];
 
 const AppNavigator = () => {
+  const publicKey = usePublicKey();
+  const initialRouteName = publicKey ? Routers.MainTabScreen : Routers.IntroScreen;
   return (
-    <AppStack.Navigator screenOptions={defaultStackOptions}>
+    <AppStack.Navigator screenOptions={defaultStackOptions} initialRouteName={initialRouteName}>
       {AppRouters.map((route, index) => (
         <AppStack.Screen
           key={index}
@@ -79,4 +82,4 @@ const AppNavigator = () => {
   );
 };
 
-export {AppNavigator};
+export { AppNavigator };

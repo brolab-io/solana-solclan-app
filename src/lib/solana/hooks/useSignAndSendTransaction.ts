@@ -1,17 +1,13 @@
-import { Transaction } from "@solana/web3.js";
-import { encode } from "bs58";
-import { openURL } from "expo-linking";
-import { useCallback, useRef } from "react";
-import {
-  onSignAndSendTransactionRedirectLink,
-  onSignTransactionRedirectLink,
-} from "../constants/URL";
-import { useSolana } from "../providers/SolanaProvider";
-import { encryptPayload, buildUrl } from "../utils";
-import useDAppKeypair from "./useDAppKeypair";
-import usePublicKey from "./usePublicKey";
-import useSession from "./useSession";
-import useSharedSecret from "./useSharedSecret";
+import { Transaction } from '@solana/web3.js';
+import { encode } from 'bs58';
+import { useCallback } from 'react';
+import { onSignAndSendTransactionRedirectLink } from '../constants/URL';
+import { useSolana } from '../providers/SolanaProvider';
+import { encryptPayload, buildUrl, Linking } from '../utils';
+import useDAppKeypair from './useDAppKeypair';
+import usePublicKey from './usePublicKey';
+import useSession from './useSession';
+import useSharedSecret from './useSharedSecret';
 
 const useSignAndSendTransaction = () => {
   const publicKey = usePublicKey();
@@ -24,18 +20,24 @@ const useSignAndSendTransaction = () => {
     async (transaction: Transaction) => {
       if (!sharedSecret || !publicKey || !session) {
         let missingFields = [];
-        if (!sharedSecret) missingFields.push("sharedSecret");
-        if (!publicKey) missingFields.push("publicKey");
-        if (!session) missingFields.push("session");
+        if (!sharedSecret) {
+          missingFields.push('sharedSecret');
+        }
+        if (!publicKey) {
+          missingFields.push('publicKey');
+        }
+        if (!session) {
+          missingFields.push('session');
+        }
         return Promise.reject(
-          `Missing ${missingFields.join(", ")} on useSignAndSendTransaction hook`
+          `Missing ${missingFields.join(', ')} on useSignAndSendTransaction hook`,
         );
       }
 
       const serializedTransaction = encode(
         transaction.serialize({
           requireAllSignatures: false,
-        })
+        }),
       );
 
       const payload = {
@@ -43,7 +45,7 @@ const useSignAndSendTransaction = () => {
         transaction: serializedTransaction,
       };
 
-      console.log("payload", payload);
+      console.log('payload', payload);
 
       const [nonce, encryptedPayload] = encryptPayload(payload, sharedSecret);
 
@@ -54,17 +56,17 @@ const useSignAndSendTransaction = () => {
         payload: encode(encryptedPayload),
       });
 
-      const url = buildUrl("signAndSendTransaction", params);
+      const url = buildUrl('signAndSendTransaction', params);
 
       const promise = new Promise<Transaction>((resolve, reject) => {
         txPromise.current = { resolve, reject };
       });
 
-      await openURL(url);
+      await Linking.openURL(url);
 
       return promise;
     },
-    [sharedSecret, dappKeyPair.publicKey, session, publicKey]
+    [sharedSecret, publicKey, session, dappKeyPair.publicKey, txPromise],
   );
 
   return signAndSendTransaction;

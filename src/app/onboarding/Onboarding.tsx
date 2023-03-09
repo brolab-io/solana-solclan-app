@@ -1,19 +1,28 @@
 import Button from '@/components/Button';
-import {Routers} from '@/constants/Routers';
-import {useMyNavigation} from '@/navigator/Navigation';
-import {BlurView} from '@react-native-community/blur';
-import {Box, Image, Text, VStack} from 'native-base';
-import React, {PropsWithChildren, useCallback} from 'react';
-import {StyleSheet} from 'react-native';
-const background = require('../../../assets/background.png');
-const solIcon = require('../../../assets/sol_icon.png');
+import { Routers } from '@/constants/Routers';
+import useConnect from '@/lib/solana/hooks/useConnect';
+import { useMyNavigation } from '@/navigator/Navigation';
+import { BlurView } from '@react-native-community/blur';
+import { Box, Image, Text, VStack } from 'native-base';
+import React, { PropsWithChildren, useCallback, useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+
+import background from '../../../assets/background.png';
+import solIcon from '../../../assets/sol_icon.png';
 
 const IntroScreen: React.FC<PropsWithChildren> = () => {
-  const {navigate} = useMyNavigation();
+  const { navigate } = useMyNavigation();
+  const { connect, isConnected, publicKey } = useConnect();
   const letsPress = useCallback(() => {
-    console.log('letsPress');
-    navigate(Routers.MainTabScreen);
-  }, [navigate]);
+    connect();
+  }, [connect]);
+
+  useEffect(() => {
+    if (isConnected && publicKey) {
+      console.log(`Solana connected: ${publicKey.toBase58()}`);
+      navigate(Routers.MainTabScreen);
+    }
+  }, [isConnected, navigate, publicKey]);
 
   return (
     <Box h="100%" position="relative" backgroundColor="black">
@@ -61,7 +70,7 @@ const IntroScreen: React.FC<PropsWithChildren> = () => {
           </Text>
           <Button mb="5" onPress={letsPress}>
             <Text color="white" fontSize="xl">
-              Let’s Explore! 🔥
+              Let's Explore! 🔥
             </Text>
           </Button>
         </VStack>

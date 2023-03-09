@@ -1,16 +1,14 @@
-import { encode } from "bs58";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { buildUrl } from "../utils";
-import tweetnacl from "tweetnacl";
-import { openURL } from "expo-linking";
+import { encode } from 'bs58';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { buildUrl, Linking } from '../utils';
 
-import { onConnectRedirectLink } from "../constants/URL";
-import useCluster from "./useCluster";
-import useDAppKeypair from "./useDAppKeypair";
-import usePublicKey from "./usePublicKey";
-import { PublicKey } from "@solana/web3.js";
+import { onConnectRedirectLink } from '../constants/URL';
+import useCluster from './useCluster';
+import useDAppKeypair from './useDAppKeypair';
+import usePublicKey from './usePublicKey';
+import { PublicKey } from '@solana/web3.js';
 
-const app_url = "https://phantom.app";
+const app_url = 'https://phantom.app';
 
 type State = {
   isConnecting: boolean;
@@ -36,29 +34,29 @@ const useConnect = () => {
       app_url,
       redirect_link: onConnectRedirectLink,
     });
-    const url = buildUrl("connect", params);
-    setState((prevState) => ({
+    const url = buildUrl('connect', params);
+    setState(prevState => ({
       ...prevState,
       isConnecting: true,
       isConnected: false,
       error: null,
     }));
     try {
-      await openURL(url);
-      setState((prevState) => ({
+      await Linking.openURL(url);
+      setState(prevState => ({
         ...prevState,
         isConnecting: false,
         isConnected: true,
         error: null,
       }));
     } catch (error) {
-      setState((prevState) => ({ ...prevState, isConnecting: false, isConnected: false, error }));
+      setState(prevState => ({ ...prevState, isConnecting: false, isConnected: false, error }));
     }
-  }, []);
+  }, [cluster, publicKey]);
 
   useEffect(() => {
     if (connectedPublicKey) {
-      setState((prevState) => ({
+      setState(prevState => ({
         ...prevState,
         isConnecting: false,
         isConnected: true,

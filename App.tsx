@@ -6,14 +6,14 @@
  */
 
 import React from 'react';
-import {StyleSheet, StatusBar, SafeAreaView} from 'react-native';
-import {QueryClientProvider} from '@tanstack/react-query';
-import {NativeBaseProvider} from 'native-base';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {queryClient} from './config/query.client';
-import {NavigationContainer} from '@react-navigation/native';
-import {AppNavigator} from './src/navigator/Navigation';
-import {SolanaProvider} from '@/lib/solana';
+import { StyleSheet, StatusBar, SafeAreaView } from 'react-native';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { NativeBaseProvider } from 'native-base';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { queryClient } from './config/query.client';
+import { NavigationContainer } from '@react-navigation/native';
+import { AppNavigator } from './src/navigator/Navigation';
+import { SolanaProvider } from '@/lib/solana';
 
 const App: React.FC = () => {
   return (
