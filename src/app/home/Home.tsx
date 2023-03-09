@@ -1,11 +1,12 @@
-import React, {PropsWithChildren} from 'react';
-import {Box, ScrollView, VStack} from 'native-base';
+import React, {PropsWithChildren, useCallback} from 'react';
+import {ScrollView, VStack} from 'native-base';
 import ButtonTab, {ButtonType} from '@/components/ButtonTab';
 import CardItems from '@/components/CardItems';
 import {CardItemType} from '@/components/CardItem';
 import Header from '@/components/Header';
-import {ImageBackground} from 'react-native';
 import Layout from '@/components/Layout';
+import {useMyNavigation} from '@/navigator/Navigation';
+import {Routers} from '@/constants/Routers';
 
 const tabData: ButtonType[] = [
   {
@@ -41,7 +42,16 @@ const cardData: CardItemType[] = [
   },
 ];
 const HomeScreen: React.FC<PropsWithChildren> = () => {
+  const {navigate} = useMyNavigation();
+
   const [selected, setSelected] = React.useState(0);
+
+  const itemPress = useCallback(
+    (item: CardItemType) => {
+      navigate(Routers.ClanDetailScreen, {item});
+    },
+    [navigate],
+  );
 
   return (
     <Layout>
@@ -50,7 +60,7 @@ const HomeScreen: React.FC<PropsWithChildren> = () => {
         <ScrollView>
           <VStack px="5">
             <ButtonTab data={tabData} selected={selected} tabSelected={setSelected} />
-            <CardItems data={cardData} />
+            <CardItems data={cardData} onPress={itemPress} />
           </VStack>
         </ScrollView>
       </VStack>
