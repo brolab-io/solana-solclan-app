@@ -1,9 +1,11 @@
 import React, {PropsWithChildren} from 'react';
-import {VStack} from 'native-base';
+import {Box, ScrollView, VStack} from 'native-base';
 import ButtonTab, {ButtonType} from '@/components/ButtonTab';
 import CardItems from '@/components/CardItems';
 import {CardItemType} from '@/components/CardItem';
 import Header from '@/components/Header';
+import {ImageBackground} from 'react-native';
+import Layout from '@/components/Layout';
 
 const tabData: ButtonType[] = [
   {
@@ -42,22 +44,17 @@ const HomeScreen: React.FC<PropsWithChildren> = () => {
   const [selected, setSelected] = React.useState(0);
 
   return (
-    <VStack
-      h="100%"
-      pb="24"
-      bg={{
-        linearGradient: {
-          colors: ['#232324bb', '#121211'],
-          start: [0, 0],
-          end: [1, 0],
-        },
-      }}>
-      <Header title="SOLCLAN" />
-      <VStack px="5">
-        <ButtonTab data={tabData} selected={selected} tabSelected={setSelected} />
-        <CardItems data={cardData} />
+    <Layout>
+      <VStack h="100%" pb="24" backgroundColor="transparent">
+        <Header title="SOLCLAN" />
+        <ScrollView>
+          <VStack px="5">
+            <ButtonTab data={tabData} selected={selected} tabSelected={setSelected} />
+            <CardItems data={cardData} />
+          </VStack>
+        </ScrollView>
       </VStack>
-    </VStack>
+    </Layout>
   );
 };
 

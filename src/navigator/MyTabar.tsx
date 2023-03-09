@@ -2,7 +2,7 @@ import {BottomTabBarProps, BottomTabNavigationOptions} from '@react-navigation/b
 import {CommonActions} from '@react-navigation/native';
 import {Box} from 'native-base';
 import React, {memo, useCallback} from 'react';
-import {Pressable, StyleSheet} from 'react-native';
+import {ImageBackground, Pressable, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const tabOptions = [
@@ -83,29 +83,22 @@ const TabItem: React.FC<TabItemProps> = memo(
 
 const MyTabBar = ({state, descriptors, navigation}: BottomTabBarProps) => {
   return (
-    <Box
-      style={styles.tabContainer}
-      bg={{
-        linearGradient: {
-          //   colors: ['rgba(30, 30, 30,1)', 'rgba(30, 30, 30,1)'],
-          colors: ['#232324bb', '#121211'],
-          start: [0, 0],
-          end: [1, 0],
-        },
-      }}>
-      {state.routes.map((route, index) => {
-        const {options} = descriptors[route.key];
-        return (
-          <TabItem
-            key={route.key}
-            options={options}
-            state={state}
-            navigation={navigation}
-            index={index}
-            route={route}
-          />
-        );
-      })}
+    <Box style={styles.tabContainer}>
+      <ImageBackground source={require('../../assets/tab_bg.png')} style={styles.tabImage}>
+        {state.routes.map((route, index) => {
+          const {options} = descriptors[route.key];
+          return (
+            <TabItem
+              key={route.key}
+              options={options}
+              state={state}
+              navigation={navigation}
+              index={index}
+              route={route}
+            />
+          );
+        })}
+      </ImageBackground>
     </Box>
   );
 };
@@ -121,6 +114,11 @@ const styles = StyleSheet.create({
     height: 80,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+    overflow: 'hidden',
+  },
+  tabImage: {
+    flex: 1,
+    flexDirection: 'row',
   },
   itemContainer: {
     flex: 1,

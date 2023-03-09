@@ -19,7 +19,7 @@ const ButtonTab: React.FC<PropsWithChildren<Props>> = ({
   ...props
 }: Props) => {
   return (
-    <HStack mt="10" {...props}>
+    <HStack mt="5" {...props}>
       {data.map((item, index) => (
         <Button
           mb="5"
