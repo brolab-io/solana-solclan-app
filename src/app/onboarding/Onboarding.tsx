@@ -11,7 +11,6 @@ const solIcon = require('../../../assets/sol_icon.png');
 const IntroScreen: React.FC<PropsWithChildren> = () => {
   const {navigate} = useMyNavigation();
   const letsPress = useCallback(() => {
-    console.log('letsPress');
     navigate(Routers.MainTabScreen);
   }, [navigate]);
 
