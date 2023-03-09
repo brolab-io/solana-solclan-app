@@ -1,8 +1,9 @@
-import {BottomTabBarProps, BottomTabNavigationOptions} from '@react-navigation/bottom-tabs';
-import {CommonActions} from '@react-navigation/native';
-import {Box} from 'native-base';
-import React, {memo, useCallback} from 'react';
-import {Pressable, StyleSheet} from 'react-native';
+import { BottomTabBarProps, BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { CommonActions } from '@react-navigation/native';
+import { Box } from 'native-base';
+import React, { memo, useCallback } from 'react';
+import { ImageBackground, Pressable, StyleSheet } from 'react-native';
+import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const tabOptions = [
@@ -37,8 +38,8 @@ type TabItemProps = {
 };
 
 const TabItem: React.FC<TabItemProps> = memo(
-  ({navigation, state, route, index, options}: TabItemProps) => {
-    const {icon} = tabOptions[index];
+  ({ navigation, state, route, index, options }: TabItemProps) => {
+    const { icon } = tabOptions[index];
 
     const isFocused = state.index === index;
     const color = isFocused ? 'white' : 'grey';
@@ -52,7 +53,7 @@ const TabItem: React.FC<TabItemProps> = memo(
 
       if (!isFocused && !event.defaultPrevented) {
         // The `merge: true` option makes sure that the params inside the tab screen are preserved
-        navigation.dispatch(CommonActions.navigate({name: route.name, merge: true}));
+        navigation.dispatch(CommonActions.navigate({ name: route.name, merge: true }));
       }
     }, [isFocused, navigation, route.key, route.name]);
 
@@ -81,31 +82,31 @@ const TabItem: React.FC<TabItemProps> = memo(
   },
 );
 
-const MyTabBar = ({state, descriptors, navigation}: BottomTabBarProps) => {
+const bottomEdge: Edge[] = ['bottom'];
+
+const MyTabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
   return (
-    <Box
-      style={styles.tabContainer}
-      bg={{
-        linearGradient: {
-          //   colors: ['rgba(30, 30, 30,1)', 'rgba(30, 30, 30,1)'],
-          colors: ['#232324bb', '#121211'],
-          start: [0, 0],
-          end: [1, 0],
-        },
-      }}>
-      {state.routes.map((route, index) => {
-        const {options} = descriptors[route.key];
-        return (
-          <TabItem
-            key={route.key}
-            options={options}
-            state={state}
-            navigation={navigation}
-            index={index}
-            route={route}
-          />
-        );
-      })}
+    <Box style={styles.tabContainer}>
+      <ImageBackground
+        source={require('../assets/tab_bg.png')}
+        style={styles.imageBg}
+        resizeMode="cover">
+        <SafeAreaView edges={bottomEdge} style={styles.tabImage}>
+          {state.routes.map((route, index) => {
+            const { options } = descriptors[route.key];
+            return (
+              <TabItem
+                key={route.key}
+                options={options}
+                state={state}
+                navigation={navigation}
+                index={index}
+                route={route}
+              />
+            );
+          })}
+        </SafeAreaView>
+      </ImageBackground>
     </Box>
   );
 };
@@ -118,9 +119,14 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: 'row',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    height: 80,
+    // height: 80,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+    overflow: 'hidden',
+  },
+  tabImage: {
+    flex: 1,
+    flexDirection: 'row',
   },
   itemContainer: {
     flex: 1,
@@ -129,12 +135,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: '#167ac60A',
   },
-  absolute: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
+  imageBg: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 });
 
