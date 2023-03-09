@@ -10,7 +10,7 @@ import { StyleSheet } from 'react-native';
 import background from '../../../assets/background.png';
 import solIcon from '../../../assets/sol_icon.png';
 
-const IntroScreen: React.FC<PropsWithChildren> = () => {
+const OnboardingScreen: React.FC<PropsWithChildren> = () => {
   const { navigate } = useMyNavigation();
   const { connect, isConnected, publicKey } = useConnect();
   const letsPress = useCallback(() => {
@@ -26,7 +26,7 @@ const IntroScreen: React.FC<PropsWithChildren> = () => {
 
   return (
     <Box h="100%" position="relative" backgroundColor="black">
-      <Image source={background} alt="solclan" />
+      <Image source={background} alt="solclan" resizeMode="cover" />
       <Box position="absolute" bottom="0" width="100%" height="40%">
         <VStack
           position="relative"
@@ -89,4 +89,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IntroScreen;
+export default OnboardingScreen;

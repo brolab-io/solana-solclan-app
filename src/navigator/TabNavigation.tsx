@@ -3,7 +3,7 @@ import {BottomTabNavigationOptions, createBottomTabNavigator} from '@react-navig
 import React from 'react';
 import MyTabBar from './MyTabar';
 import HomeScreen from '@/app/home/Home';
-import IntroScreen from '@/app/onboarding/Onboarding';
+import OnboardingScreen from '@/app/onboarding/Onboarding';
 
 const MainTabStack = createBottomTabNavigator();
 const tabarOption: BottomTabNavigationOptions = {
@@ -13,11 +13,11 @@ const tabarOption: BottomTabNavigationOptions = {
 const MainTabScreen: React.FC = () => {
   return (
     <MainTabStack.Navigator screenOptions={tabarOption} tabBar={props => <MyTabBar {...props} />}>
-      <MainTabStack.Screen name={Routers.IntroScreen} component={HomeScreen} />
-      <MainTabStack.Screen name={'sdfasd'} component={IntroScreen} />
-      <MainTabStack.Screen name={'sdfasddfds'} component={IntroScreen} />
-      <MainTabStack.Screen name={'sdfasdsdfsdf'} component={IntroScreen} />
-      <MainTabStack.Screen name={'sdfasdsdfdsdfsdf'} component={IntroScreen} />
+      <MainTabStack.Screen name={Routers.OnboardingScreen} component={HomeScreen} />
+      <MainTabStack.Screen name={'sdfasd'} component={OnboardingScreen} />
+      <MainTabStack.Screen name={'sdfasddfds'} component={OnboardingScreen} />
+      <MainTabStack.Screen name={'sdfasdsdfsdf'} component={OnboardingScreen} />
+      <MainTabStack.Screen name={'sdfasdsdfdsdfsdf'} component={OnboardingScreen} />
     </MainTabStack.Navigator>
   );
 };

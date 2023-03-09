@@ -1,4 +1,5 @@
 export enum Routers {
-  IntroScreen = 'IntroScreen',
+  OnboardingScreen = 'OnboardingScreen',
   MainTabScreen = 'MainTabScreen',
+  ClanDetailScreen = 'ClanDetailScreen',
 }

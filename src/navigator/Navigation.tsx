@@ -14,15 +14,18 @@ import {
   TransitionPresets,
 } from '@react-navigation/stack';
 import { Routers } from '../constants/Routers';
-import IntroScreen from '../app/onboarding/Onboarding';
+import OnboardingScreen from '../app/onboarding/Onboarding';
 import MainTabScreen from './TabNavigation';
+import ClanDetailScreen from '@/app/home/ClanDetail';
+import { CardItemType } from '@/components/CardItem';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 
 const AppStack = createStackNavigator<MyParamList>();
 
 type MyParamList = {
-  [Routers.IntroScreen]: undefined;
+  [Routers.OnboardingScreen]: undefined;
   [Routers.MainTabScreen]: undefined;
+  [Routers.ClanDetailScreen]: { item: CardItemType };
 };
 
 export const useMyRoute = <T extends keyof MyParamList>() => {
@@ -50,8 +53,8 @@ const defaultStackOptions: StackNavigationOptions = {
 
 const AppRouters: MyRouteConfig[] = [
   {
-    name: Routers.IntroScreen,
-    component: IntroScreen,
+    name: Routers.OnboardingScreen,
+    component: OnboardingScreen,
     options: {
       headerShown: false,
     },
@@ -63,11 +66,18 @@ const AppRouters: MyRouteConfig[] = [
       headerShown: false,
     },
   },
+  {
+    name: Routers.ClanDetailScreen,
+    component: ClanDetailScreen,
+    options: {
+      headerShown: false,
+    },
+  },
 ];
 
 const AppNavigator = () => {
   const publicKey = usePublicKey();
-  const initialRouteName = publicKey ? Routers.MainTabScreen : Routers.IntroScreen;
+  const initialRouteName = publicKey ? Routers.MainTabScreen : Routers.OnboardingScreen;
   return (
     <AppStack.Navigator screenOptions={defaultStackOptions} initialRouteName={initialRouteName}>
       {AppRouters.map((route, index) => (
