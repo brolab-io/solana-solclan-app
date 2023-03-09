@@ -19,12 +19,14 @@ import MainTabScreen from './TabNavigation';
 import ClanDetailScreen from '@/app/home/ClanDetail';
 import { CardItemType } from '@/components/CardItem';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
+import CreateClanScreen from '@/app/create-clan/CreateClan';
 
 const AppStack = createStackNavigator<MyParamList>();
 
 type MyParamList = {
   [Routers.OnboardingScreen]: undefined;
   [Routers.MainTabScreen]: undefined;
+  [Routers.CreateClanScreen]: undefined;
   [Routers.ClanDetailScreen]: { item: CardItemType };
 };
 
@@ -69,6 +71,13 @@ const AppRouters: MyRouteConfig[] = [
   {
     name: Routers.ClanDetailScreen,
     component: ClanDetailScreen,
+    options: {
+      headerShown: false,
+    },
+  },
+  {
+    name: Routers.CreateClanScreen,
+    component: CreateClanScreen,
     options: {
       headerShown: false,
     },

@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback } from 'react';
+import React, { PropsWithChildren, useCallback, useEffect } from 'react';
 import { ScrollView, VStack } from 'native-base';
 import ButtonTab, { ButtonType } from '@/components/ButtonTab';
 import CardItems from '@/components/CardItems';
@@ -8,6 +8,8 @@ import Layout from '@/components/Layout';
 import { useMyNavigation } from '@/navigator/Navigation';
 import { Routers } from '@/constants/Routers';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
+import useProgram from '@/lib/solana/hooks/useProgram';
+import { solClanIDL } from '@/configs/programs/solscan';
 
 const tabData: ButtonType[] = [
   {
@@ -46,8 +48,18 @@ const bottomEdge: Edge[] = ['bottom'];
 
 const HomeScreen: React.FC<PropsWithChildren> = () => {
   const { navigate } = useMyNavigation();
+  const { program } = useProgram(solClanIDL, '7SuqbkN8yMTXqQPdoUQ1DksQqGE6QKoeaC2j6N7cNmAF');
 
   const [selected, setSelected] = React.useState(0);
+
+  const fetchClans = useCallback(async () => {
+    const result = await program?.account.clan.all();
+    console.log('result', result);
+  }, [program]);
+
+  useEffect(() => {
+    fetchClans();
+  }, [fetchClans]);
 
   const itemPress = useCallback(
     (item: CardItemType) => {

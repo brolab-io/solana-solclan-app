@@ -9,7 +9,7 @@ type Props = {
 };
 const Header: React.FC<Props> = ({ canGoBack = false, title }: Props) => {
   const { goBack } = useMyNavigation();
-  const publicKey = usePublicKey()!.toBase58();
+  const publicKey = usePublicKey()?.toBase58() || '';
   return (
     <>
       {!canGoBack ? (

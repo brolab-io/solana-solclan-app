@@ -9,11 +9,18 @@ import { StyleSheet } from 'react-native';
 
 import background from '../../assets/background.png';
 import solIcon from '../../assets/sol_icon.png';
+import phantomIcon from '../../assets/icons/phantom_24x24.png';
+
+console.log('phantomIcon', phantomIcon);
 
 const OnboardingScreen: React.FC<PropsWithChildren> = () => {
   const { navigate } = useMyNavigation();
   const { connect, isConnected, publicKey } = useConnect();
-  const letsPress = useCallback(() => {
+  const handlePressExplore = useCallback(() => {
+    navigate(Routers.MainTabScreen);
+  }, [navigate]);
+
+  const handlePressConnect = useCallback(() => {
     connect();
   }, [connect]);
 
@@ -68,11 +75,18 @@ const OnboardingScreen: React.FC<PropsWithChildren> = () => {
           <Text color="white" fontSize="3xl" fontWeight="bold" mt="5">
             Invest with a community, not just a platform
           </Text>
-          <Button mb="5" onPress={letsPress}>
-            <Text color="white" fontSize="xl">
-              Let's Explore! 🔥
-            </Text>
-          </Button>
+          <VStack mb="6" width="full" space="4">
+            <Button onPress={handlePressExplore}>
+              <Text color="white" fontSize="xl">
+                Let's Explore! 🔥
+              </Text>
+            </Button>
+            <Button backgroundColor="#543bd6" leftIcon={phantomIcon} onPress={handlePressConnect}>
+              <Text color="white" fontSize="xl" ml="2">
+                Connect Wallet
+              </Text>
+            </Button>
+          </VStack>
         </VStack>
       </Box>
     </Box>

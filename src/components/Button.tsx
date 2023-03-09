@@ -1,7 +1,7 @@
-import React, {ComponentProps, PropsWithChildren} from 'react';
-import {HStack, Pressable} from 'native-base';
-import {Image} from 'react-native';
-import {ImageSourcePropType} from 'react-native/types';
+import React, { ComponentProps, PropsWithChildren } from 'react';
+import { HStack, Pressable } from 'native-base';
+import { Image } from 'react-native';
+import { ImageSourcePropType } from 'react-native/types';
 
 type Props = {
   leftIcon?: ImageSourcePropType;
@@ -26,7 +26,7 @@ const Button: React.FC<PropsWithChildren<Props>> = ({
       py="3"
       rounded="full"
       {...props}>
-      <Pressable flexDirection="row" onPress={onPress}>
+      <Pressable alignItems="center" flexDirection="row" onPress={onPress}>
         {leftIcon ? <Image source={leftIcon} alt="icon" /> : null}
         {children}
         {rightIcon ? <Image source={rightIcon} alt="icon" /> : null}
