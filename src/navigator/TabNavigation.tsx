@@ -10,11 +10,11 @@ import IntroScreen from '@/app/onboarding/Onboarding';
 const MainTabStack = createBottomTabNavigator();
 const tabarOption: BottomTabNavigationOptions = {
   headerShown: false,
-  tabBarActiveTintColor: '#215BF0',
-  tabBarInactiveTintColor: '#D60053',
-  tabBarStyle: {
-    backgroundColor: 'transparent',
-  },
+  // tabBarActiveTintColor: 'white',
+  // tabBarInactiveTintColor: '#D60053',
+  // tabBarStyle: {
+  //   backgroundColor: 'transparent',
+  // },
   tabBarBackground: () => (
     <BlurView
       style={styles.absolute}
@@ -28,10 +28,7 @@ const tabarOption: BottomTabNavigationOptions = {
 
 const MainTabScreen: React.FC = () => {
   return (
-    <MainTabStack.Navigator
-      screenOptions={tabarOption}
-      tabBar={props => <MyTabBar {...props} />}
-      sceneContainerStyle={{backgroundColor: 'transparent'}}>
+    <MainTabStack.Navigator screenOptions={tabarOption} tabBar={props => <MyTabBar {...props} />}>
       <MainTabStack.Screen name={Routers.IntroScreen} component={HomeScreen} />
       <MainTabStack.Screen name={'sdfasd'} component={IntroScreen} />
       <MainTabStack.Screen name={'sdfasddfds'} component={IntroScreen} />

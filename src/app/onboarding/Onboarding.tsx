@@ -1,4 +1,6 @@
 import Button from '@/components/Button';
+import {Routers} from '@/constants/Routers';
+import {useMyNavigation} from '@/navigator/Navigation';
 import {BlurView} from '@react-native-community/blur';
 import {Box, Image, Text, VStack} from 'native-base';
 import React, {PropsWithChildren, useCallback} from 'react';
@@ -7,9 +9,11 @@ const background = require('../../../assets/background.png');
 const solIcon = require('../../../assets/sol_icon.png');
 
 const IntroScreen: React.FC<PropsWithChildren> = () => {
+  const {navigate} = useMyNavigation();
   const letsPress = useCallback(() => {
     console.log('letsPress');
-  }, []);
+    navigate(Routers.MainTabScreen);
+  }, [navigate]);
 
   return (
     <Box h="100%" position="relative" backgroundColor="black">

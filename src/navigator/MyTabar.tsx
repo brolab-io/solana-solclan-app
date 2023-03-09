@@ -1,9 +1,8 @@
-import {BlurView} from '@react-native-community/blur';
 import {BottomTabBarProps, BottomTabNavigationOptions} from '@react-navigation/bottom-tabs';
 import {CommonActions} from '@react-navigation/native';
 import {Box} from 'native-base';
 import React, {memo, useCallback} from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const tabOptions = [
@@ -42,7 +41,7 @@ const TabItem: React.FC<TabItemProps> = memo(
     const {icon} = tabOptions[index];
 
     const isFocused = state.index === index;
-    const color = isFocused ? 'red' : 'grey';
+    const color = isFocused ? 'white' : 'grey';
 
     const onPress = useCallback(() => {
       const event = navigation.emit({

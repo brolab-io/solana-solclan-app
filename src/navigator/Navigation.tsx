@@ -49,15 +49,15 @@ const defaultStackOptions: StackNavigationOptions = {
 
 const AppRouters: MyRouteConfig[] = [
   {
-    name: Routers.MainTabScreen,
-    component: MainTabScreen,
+    name: Routers.IntroScreen,
+    component: IntroScreen,
     options: {
       headerShown: false,
     },
   },
   {
-    name: Routers.IntroScreen,
-    component: IntroScreen,
+    name: Routers.MainTabScreen,
+    component: MainTabScreen,
     options: {
       headerShown: false,
     },
