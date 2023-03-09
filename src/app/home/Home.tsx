@@ -43,7 +43,6 @@ const cardData: CardItemType[] = [
   },
 ];
 const bottomEdge: Edge[] = ['bottom'];
-const stickyHeaderIndices = [0];
 
 const HomeScreen: React.FC<PropsWithChildren> = () => {
   const { navigate } = useMyNavigation();
@@ -61,7 +60,7 @@ const HomeScreen: React.FC<PropsWithChildren> = () => {
     <Layout>
       <VStack h="100%" pb="24" backgroundColor="transparent">
         <Header title="SOLCLAN" />
-        <ScrollView stickyHeaderIndices={stickyHeaderIndices}>
+        <ScrollView>
           <ButtonTab mx="5" data={tabData} selected={selected} tabSelected={setSelected} />
           <SafeAreaView edges={bottomEdge}>
             <VStack px="5">

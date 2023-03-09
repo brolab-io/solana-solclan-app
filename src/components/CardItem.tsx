@@ -1,7 +1,7 @@
 import { Box, HStack, Image, Pressable, Text, VStack } from 'native-base';
 import React from 'react';
 
-type AuthorType = {
+export type AuthorType = {
   avatar: string;
   name: string;
 };

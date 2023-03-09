@@ -29,7 +29,7 @@ const Header: React.FC<Props> = ({ canGoBack = false, title }: Props) => {
         </HStack>
       ) : null}
       {canGoBack ? (
-        <HStack h="20" px="5" alignItems="flex-end" justifyContent="space-between">
+        <HStack py="1" px="5" alignItems="flex-end" justifyContent="space-between">
           <Pressable onPress={goBack}>
             <Image source={require('../assets/back.png')} alt="solclan" w={8} h={8} />
           </Pressable>
