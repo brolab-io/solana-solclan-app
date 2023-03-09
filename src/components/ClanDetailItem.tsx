@@ -9,25 +9,37 @@ export type ClanDetailItemType = {
   author: AuthorType;
   content: string;
   currentPrice: number;
+  vote: string;
+  isJoined: boolean;
 };
 
-const ClanDetailItem: React.FC<ClanDetailItemType> = ({ image, title, author, content }) => {
+type Props = {
+  data: ClanDetailItemType;
+};
+
+const ClanDetailItem: React.FC<Props> = ({ data }: Props) => {
   return (
     <VStack borderTopRadius={24} overflow="hidden" space="2">
-      <Image src={image} alt={title} w="100%" h={200} resizeMode="cover" />
+      <Image src={data.image} alt={data.title} w="100%" h={200} resizeMode="cover" />
       <Text color="white" fontSize="xl">
-        {title}
+        {data.title}
       </Text>
 
       <HStack justifyContent="flex-start">
         <HStack alignItems="center" space="2">
-          <Image src={author.avatar} alt={author.name} w={10} h={10} borderRadius="full" />
+          <Image
+            src={data.author.avatar}
+            alt={data.author.name}
+            w={10}
+            h={10}
+            borderRadius="full"
+          />
           <VStack>
             <Text color="#9498AA" fontSize="md">
               Founder
             </Text>
             <Text color="white" fontSize="md">
-              {author.name}
+              {data.author.name}
             </Text>
           </VStack>
         </HStack>
@@ -35,7 +47,7 @@ const ClanDetailItem: React.FC<ClanDetailItemType> = ({ image, title, author, co
 
       <Box>
         <Text color="#9498AA" fontSize="md">
-          {content}
+          {data.content}
         </Text>
       </Box>
     </VStack>

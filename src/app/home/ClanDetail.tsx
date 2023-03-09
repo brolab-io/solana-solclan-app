@@ -1,13 +1,13 @@
 import ButtonTab, { ButtonType } from '@/components/ButtonTab';
-import ClanDetailInfoTab from '@/components/ClanDetailInfoTab';
-import ClanDetailItem from '@/components/ClanDetailItem';
+import ClanDetailTab from '@/components/ClanDetailTab';
+import ClanDetailItem, { ClanDetailItemType } from '@/components/ClanDetailItem';
 import Header from '@/components/Header';
 import Layout from '@/components/Layout';
 import { ScrollView, VStack } from 'native-base';
 import React, { PropsWithChildren } from 'react';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 
-const dataItem = {
+const dataItem: ClanDetailItemType = {
   id: '2',
   image:
     'https://img.freepik.com/free-vector/gradient-liquid-abstract-background_23-2148916599.jpg?t=st=1678333832~exp=1678334432~hmac=f21042037b2f420a4a0622f622a7f471eadbb21578d453c4e5c44b9bc07bbf82',
@@ -19,6 +19,8 @@ const dataItem = {
   currentPrice: 100,
   content:
     'Brolab Clan is a community of early-stage investors focused on supporting innovative startups in the technology sector.',
+  vote: '22/50',
+  isJoined: true,
 };
 
 const tabData: ButtonType[] = [
@@ -47,7 +49,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
         <ScrollView mt="5">
           <SafeAreaView edges={bottomEdge}>
             <VStack px="5">
-              <ClanDetailItem {...dataItem} />
+              <ClanDetailItem data={dataItem} />
               <ButtonTab
                 borderRadius="full"
                 borderColor="#4C5172"
@@ -58,7 +60,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
                 selected={selected}
                 tabSelected={setSelected}
               />
-              <ClanDetailInfoTab />
+              <ClanDetailTab tabselected={selected} data={dataItem} />
             </VStack>
           </SafeAreaView>
         </ScrollView>
