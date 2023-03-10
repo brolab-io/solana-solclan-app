@@ -13,7 +13,7 @@ import { useMyRoute } from '@/navigator/Navigation';
 
 const tabData: ButtonType[] = [
   {
-    label: 'Infor',
+    label: 'Info',
   },
   {
     label: 'Member',

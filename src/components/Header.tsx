@@ -6,8 +6,9 @@ import React from 'react';
 type Props = {
   canGoBack?: boolean;
   title: string;
+  isIconTitle?: boolean;
 };
-const Header: React.FC<Props> = ({ canGoBack = false, title }: Props) => {
+const Header: React.FC<Props> = ({ canGoBack = false, title, isIconTitle = true }: Props) => {
   const { goBack } = useMyNavigation();
   const publicKey = usePublicKey()?.toBase58() || '';
   return (
@@ -15,7 +16,9 @@ const Header: React.FC<Props> = ({ canGoBack = false, title }: Props) => {
       {!canGoBack ? (
         <HStack py="1" justifyContent="space-between" px="5" alignItems="flex-end">
           <HStack space="1" alignItems="center">
-            <Image source={require('../assets/sol_icon.png')} alt="solclan" w={8} h={8} />
+            {isIconTitle ? (
+              <Image source={require('../assets/sol_icon.png')} alt="solclan" w={8} h={8} />
+            ) : null}
             <Text color="white" fontSize="xl">
               {title}
             </Text>
