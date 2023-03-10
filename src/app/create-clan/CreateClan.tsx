@@ -1,62 +1,50 @@
 import React, { PropsWithChildren, useCallback, useState } from 'react';
 import { Alert } from 'react-native';
-import { Box, HStack, Image, Input, ScrollView, Text, VStack } from 'native-base';
+import {
+  Box,
+  HStack,
+  Image,
+  Input,
+  ScrollView,
+  Text,
+  VStack,
+  Button as NativeBaseButton,
+} from 'native-base';
 import Header from '@/components/Header';
 import Layout from '@/components/Layout';
-import useProgram from '@/lib/solana/hooks/useProgram';
-import { solClanIDL } from '@/configs/programs';
 import Button from '@/components/Button';
-import usePublicKey from '@/lib/solana/hooks/usePublicKey';
-import useSignAndSendTransaction from '@/lib/solana/hooks/useSignAndSendTransaction';
-import { BN, web3 } from '@project-serum/anchor';
-import useConnection from '@/lib/solana/hooks/useConnection';
-import { findClanAccount, findClanCardAccount, findClanMemberAccount } from '@/configs/pdas';
+import { BN } from '@project-serum/anchor';
+import useCreateClanMutation from '@/hooks/mutations/useCreateClanMutation';
+import { useMyNavigation } from '@/navigator/Navigation';
+import { Routers } from '@/constants/Routers';
 
 const CreateClanScreen: React.FC<PropsWithChildren> = () => {
-  const { program } = useProgram(solClanIDL, '7SuqbkN8yMTXqQPdoUQ1DksQqGE6QKoeaC2j6N7cNmAF');
-  const publicKey = usePublicKey();
-  const signAndSendTransaction = useSignAndSendTransaction();
-  const connection = useConnection();
-
-  // State
   const [name, setName] = useState('Feng Shui');
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
+  const { mutateAsync, isLoading } = useCreateClanMutation();
+  const navigation = useMyNavigation();
 
   const handleCreateClan = useCallback(async () => {
-    if (!publicKey) {
-      return console.log('[CreateClanScreen]', 'handleCreateClan: No public key');
-    }
     const random0To9 = Math.floor(Math.random() * 10);
-    const clanId = new BN(`10${new Date().getTime()}${random0To9}`);
+    const id = new BN(`10${new Date().getTime()}${random0To9}`);
 
     try {
-      const clanAccount = findClanAccount(clanId);
-      const memberAccount = findClanMemberAccount(clanId, publicKey);
-      const cardAccount = findClanCardAccount(clanId);
-
-      const tx = await program.methods
-        .createClan(clanId, name, publicKey)
-        .accounts({
-          authority: publicKey,
-          systemProgram: web3.SystemProgram.programId,
-          clan: clanAccount,
-          member: memberAccount,
-          card: cardAccount,
-        })
-        .transaction();
-
-      tx.feePayer = publicKey;
-      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-      const txResult = await signAndSendTransaction(tx);
-      console.log('[CreateClanScreen]', 'handleCreateClan: txResult', txResult);
+      const clan = await mutateAsync({
+        id,
+        name,
+        description,
+        email,
+      });
+      navigation.navigate(Routers.MainTabScreen);
+      navigation.navigate(Routers.ClanDetailScreen, { item: clan });
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert('Failed to create clan', error.message);
       }
       console.log('[CreateClanScreen]', 'handleCreateClan: error', error);
     }
-  }, [publicKey, program.methods, name, connection, signAndSendTransaction]);
+  }, [mutateAsync, name, description, email, navigation]);
 
   return (
     <Layout>
@@ -105,6 +93,7 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
                 placeholder="Enter your clan name"
                 value={name}
                 onChangeText={setName}
+                isDisabled={isLoading}
               />
             </VStack>
             <VStack space="3">
@@ -123,6 +112,7 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
                 placeholder="Enter your clan's email address"
                 value={email}
                 onChangeText={setEmail}
+                isDisabled={isLoading}
               />
             </VStack>
             <VStack space="3">
@@ -143,14 +133,20 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
                 placeholder="What's your clan all about and who are you looking for?"
                 value={description}
                 onChangeText={setDescription}
+                isDisabled={isLoading}
               />
             </VStack>
-
-            <Button onPress={handleCreateClan}>
+            <NativeBaseButton
+              rounded="full"
+              shadow="6"
+              bg="#543bd6"
+              isLoading={isLoading}
+              py="12px"
+              onPress={handleCreateClan}>
               <Text color="white" fontSize="xl">
                 Create Clan
               </Text>
-            </Button>
+            </NativeBaseButton>
           </VStack>
         </ScrollView>
       </VStack>

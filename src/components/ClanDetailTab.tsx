@@ -1,5 +1,5 @@
-import { Box, HStack, Image, Text, VStack } from 'native-base';
-import React, { useCallback } from 'react';
+import { Box, HStack, Image, Text, VStack, Button as NativeBaseButton } from 'native-base';
+import React from 'react';
 import Button from './Button';
 import DepositActionSheet from './DepositActionSheet';
 
@@ -9,13 +9,11 @@ import dot_icon from '../assets/dot_icon.png';
 
 type Props = {
   tabselected: number;
-  onJoinOrDeposit: (isJoined: boolean) => void;
+  onJoinOrDeposit: () => void;
+  isLoadingMember: boolean;
+  hasJoined: boolean;
 };
-const ClanDetailTab = ({ tabselected, onJoinOrDeposit }: Props) => {
-  const onJoinOrDepositPress = useCallback(() => {
-    onJoinOrDeposit(false);
-  }, [onJoinOrDeposit]);
-
+const ClanDetailTab = ({ tabselected, onJoinOrDeposit, isLoadingMember, hasJoined }: Props) => {
   return (
     <VStack>
       {tabselected === 0 ? (
@@ -51,11 +49,18 @@ const ClanDetailTab = ({ tabselected, onJoinOrDeposit }: Props) => {
               </VStack>
             ) : null}
           </HStack>
-          <Button mb="5" onPress={onJoinOrDepositPress}>
+          <NativeBaseButton
+            disabled={isLoadingMember}
+            isLoading={isLoadingMember}
+            rounded="full"
+            py="12px"
+            mb="5"
+            bg="#2F80ED"
+            onPress={onJoinOrDeposit}>
             <Text color="white" fontSize="xl" fontWeight="bold">
-              {!false ? 'Join Clan' : 'Deposit'}
+              {isLoadingMember ? 'Checking...' : hasJoined ? 'Deposit' : 'Join Clan'}
             </Text>
-          </Button>
+          </NativeBaseButton>
         </VStack>
       ) : null}
       {tabselected === 1 ? (

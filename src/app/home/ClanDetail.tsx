@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback, useState } from 'react';
+import React, { PropsWithChildren, useCallback, useState, useMemo } from 'react';
 import ButtonTab, { ButtonType } from '@/components/ButtonTab';
 import ClanDetailTab from '@/components/ClanDetailTab';
 import ClanDetailItem from '@/components/ClanDetailItem';
@@ -10,6 +10,11 @@ import { SheetManager } from 'react-native-actions-sheet';
 import { ACTION_SHEET } from '@/constants/ActionSheet';
 import { Routers } from '@/constants/Routers';
 import { useMyRoute } from '@/navigator/Navigation';
+import useProgram from '@/lib/solana/hooks/useProgram';
+import { solClanIDL, solClanProgramId } from '@/configs/programs';
+import { findClanAccount, findClanMemberAccount } from '@/configs/pdas';
+import usePublicKey from '@/lib/solana/hooks/usePublicKey';
+import { useQuery } from '@tanstack/react-query';
 
 const tabData: ButtonType[] = [
   {
@@ -30,17 +35,46 @@ const bottomEdge: Edge[] = ['bottom'];
 
 const ClanDetail: React.FC<PropsWithChildren> = () => {
   const [selected, setSelected] = useState(0);
+  const publicKey = usePublicKey();
+  const { program } = useProgram(solClanIDL, solClanProgramId);
   const {
     params: { item },
   } = useMyRoute<Routers.ClanDetailScreen>();
 
+  const memberAccount = useMemo(() => {
+    if (!publicKey) {
+      return null;
+    }
+    const clanAccount = findClanAccount(item.id);
+    return findClanMemberAccount(clanAccount, publicKey);
+  }, [item.id, publicKey]);
+
+  const {
+    data: member,
+    isLoading: isLoadingMember,
+    error,
+  } = useQuery(['clanMember', memberAccount], async () => {
+    if (!memberAccount) {
+      return null;
+    }
+    return await program.account.member.fetch(memberAccount);
+  });
+
+  const hasJoined = useMemo(() => {
+    if (!member) {
+      return false;
+    }
+    if (error instanceof Error && error.message.includes('Account does not exist or has no data')) {
+      return false;
+    }
+    return true;
+  }, [error, member]);
+
   const onJoinOrDeposit = useCallback(() => {
-    // TODO: check isJoined in item
-    const isJoined = false;
-    if (isJoined) {
+    if (hasJoined) {
       SheetManager.show(ACTION_SHEET.DEPOSIT);
     }
-  }, []);
+  }, [hasJoined]);
 
   return (
     <Layout>
@@ -60,7 +94,12 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
                 selected={selected}
                 tabSelected={setSelected}
               />
-              <ClanDetailTab tabselected={selected} onJoinOrDeposit={onJoinOrDeposit} />
+              <ClanDetailTab
+                isLoadingMember={isLoadingMember}
+                hasJoined={hasJoined}
+                tabselected={selected}
+                onJoinOrDeposit={onJoinOrDeposit}
+              />
             </VStack>
           </SafeAreaView>
         </ScrollView>
