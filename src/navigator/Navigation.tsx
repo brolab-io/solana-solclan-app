@@ -28,6 +28,7 @@ type MyParamList = {
   [Routers.MainTabScreen]: undefined;
   [Routers.CreateClanScreen]: undefined;
   [Routers.ClanDetailScreen]: { item: ClanData };
+  [Routers.ProfileScreen]: undefined;
 };
 
 export const useMyRoute = <T extends keyof MyParamList>() => {
