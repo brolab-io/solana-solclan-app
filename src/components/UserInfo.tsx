@@ -1,26 +1,14 @@
 import { Box, HStack, Image, Text, VStack } from 'native-base';
-import React, { PropsWithChildren, useState } from 'react';
-import ButtonTab, { ButtonType } from './ButtonTab';
-
-const tabData: ButtonType[] = [
-  {
-    label: 'Clan',
-  },
-  {
-    label: 'Proposal',
-  },
-];
+import React, { PropsWithChildren } from 'react';
 
 type Props = {
   data: any;
 };
 const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data }) => {
-  const [selected, setSelected] = useState(0);
-
   return (
-    <VStack px="10" mt="10">
-      <HStack space="10" alignItems="center">
-        <Image src={data.avatar} alt="avatar" w="24" h="24" rounded="full" />
+    <VStack px="5" mt="10" space="5">
+      <HStack space="5" alignItems="center">
+        <Image src={data.avatar} alt="avatar" w="32" h="32" rounded="full" />
         <VStack>
           <Text color="white" fontSize="2xl">
             {data.name}
@@ -31,9 +19,9 @@ const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data }) => {
         </VStack>
       </HStack>
 
-      <HStack mt="5" justifyContent="space-between">
+      <HStack justifyContent="space-between">
         <VStack justifyContent="center" alignItems="center" w="25%">
-          <Text color="white" fontSize="2xl">
+          <Text color="white" fontSize="xl">
             {data.clan_number}
           </Text>
           <Text color="white" fontSize="md">
@@ -47,15 +35,15 @@ const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data }) => {
           borderRightWidth="1"
           w="50%"
           borderColor="#4C5172">
-          <Text color="white" fontSize="2xl">
+          <Text color="white" fontSize="xl">
             {data.deposit}
           </Text>
           <Text color="white" fontSize="md">
             Total Deposit
           </Text>
         </VStack>
-        <VStack justifyContent="center" alignItems="center" w="25%">
-          <Text color="white" fontSize="2xl">
+        <VStack alignItems="center" w="25%">
+          <Text color="white" fontSize="xl">
             {data.proposal}
           </Text>
           <Text color="white" fontSize="md">
@@ -68,19 +56,6 @@ const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data }) => {
         <Text color="white" fontSize="md">
           {data.description}
         </Text>
-      </Box>
-
-      <Box>
-        <ButtonTab
-          borderRadius="full"
-          borderColor="#4C5172"
-          borderWidth="1"
-          p="1"
-          justifyContent="space-between"
-          data={tabData}
-          selected={selected}
-          tabSelected={setSelected}
-        />
       </Box>
     </VStack>
   );
