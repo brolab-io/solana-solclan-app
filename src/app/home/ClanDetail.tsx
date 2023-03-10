@@ -18,7 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 const tabData: ButtonType[] = [
   {
-    label: 'Infor',
+    label: 'Info',
   },
   {
     label: 'Member',

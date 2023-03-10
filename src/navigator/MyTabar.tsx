@@ -73,9 +73,9 @@ const TabItem: React.FC<TabItemProps> = memo(
         onLongPress={onLongPress}
         style={styles.itemContainer}>
         {index === 2 ? (
-          <Icon color={'#215BF0'} name={isFocused ? icon : icon} size={60} />
+          <Icon color={'#215BF0'} name={icon} size={60} />
         ) : (
-          <Icon color={color} name={isFocused ? icon : `${icon}-outline`} size={25} />
+          <Icon color={color} name={icon} size={25} />
         )}
       </Pressable>
     );
