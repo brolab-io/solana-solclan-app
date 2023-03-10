@@ -4,8 +4,10 @@ import ClanDetailItem, { ClanDetailItemType } from '@/components/ClanDetailItem'
 import Header from '@/components/Header';
 import Layout from '@/components/Layout';
 import { ScrollView, VStack } from 'native-base';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useCallback } from 'react';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
+import { SheetManager } from 'react-native-actions-sheet';
+import { ACTION_SHEET } from '@/constants/ActionSheet';
 
 const dataItem: ClanDetailItemType = {
   id: '2',
@@ -42,6 +44,13 @@ const bottomEdge: Edge[] = ['bottom'];
 
 const ClanDetail: React.FC<PropsWithChildren> = () => {
   const [selected, setSelected] = React.useState(0);
+
+  const onJoinOrDeposit = useCallback((isJoined: boolean) => {
+    if (isJoined) {
+      SheetManager.show(ACTION_SHEET.DEPOSIT);
+    }
+  }, []);
+
   return (
     <Layout>
       <VStack h="100%" backgroundColor="transparent">
@@ -60,7 +69,11 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
                 selected={selected}
                 tabSelected={setSelected}
               />
-              <ClanDetailTab tabselected={selected} data={dataItem} />
+              <ClanDetailTab
+                tabselected={selected}
+                data={dataItem}
+                onJoinOrDeposit={onJoinOrDeposit}
+              />
             </VStack>
           </SafeAreaView>
         </ScrollView>
