@@ -1,16 +1,17 @@
-import {VStack} from 'native-base';
-import React, {PropsWithChildren} from 'react';
-import CardItem, {CardItemType} from './CardItem';
+import { ClanData } from '@/configs/programs';
+import { VStack } from 'native-base';
+import React, { PropsWithChildren } from 'react';
+import CardItem from './CardItem';
 
 type Props = {
-  data: CardItemType[];
-  onPress: (item: CardItemType) => void;
+  data: ClanData[];
+  onPress: (item: ClanData) => void;
 };
-const CardItems: React.FC<PropsWithChildren<Props>> = ({data, onPress}) => {
+const CardItems: React.FC<PropsWithChildren<Props>> = ({ data, onPress }) => {
   return (
     <VStack space="5">
-      {data.map((item: CardItemType) => (
-        <CardItem key={item.id} {...item} onPress={() => onPress(item)} />
+      {data.map(item => (
+        <CardItem key={item.id} item={item} onPress={() => onPress(item)} />
       ))}
     </VStack>
   );

@@ -57,24 +57,16 @@ const useProgram = <T extends Idl>(idl: T, programID: string) => {
   );
 
   return useMemo(() => {
-    if (!publicKey) {
-      return {
-        program: null,
-        provider: null,
-        signAllTransactions,
-        signTransaction,
-      };
-    }
     const provider = new AnchorProvider(
       connection,
       {
+        // @ts-ignore - publicKey is optional
         publicKey,
         signAllTransactions,
         signTransaction,
       },
       { commitment: 'processed' },
     );
-    // console.log("provider", provider);
 
     const program = new Program(idl, new PublicKey(programID), provider);
 
