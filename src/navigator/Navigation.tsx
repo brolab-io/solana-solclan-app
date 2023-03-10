@@ -17,9 +17,9 @@ import { Routers } from '../constants/Routers';
 import OnboardingScreen from '../app/onboarding/Onboarding';
 import MainTabScreen from './TabNavigation';
 import ClanDetailScreen from '@/app/home/ClanDetail';
-import { CardItemType } from '@/components/CardItem';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import CreateClanScreen from '@/app/create-clan/CreateClan';
+import { ClanData } from '@/configs/programs';
 
 const AppStack = createStackNavigator<MyParamList>();
 
@@ -27,7 +27,7 @@ type MyParamList = {
   [Routers.OnboardingScreen]: undefined;
   [Routers.MainTabScreen]: undefined;
   [Routers.CreateClanScreen]: undefined;
-  [Routers.ClanDetailScreen]: { item: CardItemType };
+  [Routers.ClanDetailScreen]: { item: ClanData };
 };
 
 export const useMyRoute = <T extends keyof MyParamList>() => {

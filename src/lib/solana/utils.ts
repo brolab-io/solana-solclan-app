@@ -1,3 +1,4 @@
+import { PublicKey } from '@solana/web3.js';
 import { decode } from 'bs58';
 import { Linking as RNLinking } from 'react-native';
 import nacl from 'tweetnacl';
@@ -32,6 +33,11 @@ export const encryptPayload = (payload: any, sharedSecret: Uint8Array) => {
   );
 
   return [nonce, encryptedPayload];
+};
+
+export const formatPublicKey = (publicKey: string | PublicKey) => {
+  let _publicKey = typeof publicKey === 'string' ? publicKey : publicKey.toBase58();
+  return `0x${_publicKey.slice(0, 4)}...${_publicKey.slice(-4)}`;
 };
 
 export const Linking = {

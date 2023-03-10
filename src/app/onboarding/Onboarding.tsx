@@ -11,8 +11,6 @@ import background from '../../assets/background.png';
 import solIcon from '../../assets/sol_icon.png';
 import phantomIcon from '../../assets/icons/phantom_24x24.png';
 
-console.log('phantomIcon', phantomIcon);
-
 const OnboardingScreen: React.FC<PropsWithChildren> = () => {
   const { navigate } = useMyNavigation();
   const { connect, isConnected, publicKey } = useConnect();

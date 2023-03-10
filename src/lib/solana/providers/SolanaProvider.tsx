@@ -8,10 +8,10 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {Cluster, clusterApiUrl, Connection, PublicKey, Transaction} from '@solana/web3.js';
+import { Cluster, clusterApiUrl, Connection, PublicKey, Transaction } from '@solana/web3.js';
 import nacl from 'tweetnacl';
-import {decode} from 'bs58';
-import {decryptPayload, Linking} from '../utils';
+import { decode } from 'bs58';
+import { decryptPayload, Linking } from '../utils';
 
 type ContextValue = {
   cluster: Cluster;
@@ -54,7 +54,7 @@ export const SolanaProvider: React.FC<PropsWithChildren<Props>> = ({
   const addLog = useCallback((log: string) => setLogs(logs => [...logs, '> ' + log]), []);
 
   const handleDeepLink: Parameters<typeof Linking.addEventListener>[1] = useCallback(
-    ({url: deepLink}) => {
+    ({ url: deepLink }) => {
       const url = new URL(deepLink);
       const params = url.searchParams;
 

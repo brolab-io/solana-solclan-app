@@ -1,4 +1,4 @@
-type SolanaSolclan = {
+export type SolanaSolclan = {
   version: '0.1.0';
   name: 'solana_solclan';
   instructions: [
@@ -16,9 +16,19 @@ type SolanaSolclan = {
           isSigner: false;
         },
         {
+          name: 'card';
+          isMut: false;
+          isSigner: false;
+        },
+        {
           name: 'authority';
           isMut: true;
           isSigner: true;
+        },
+        {
+          name: 'tokenProgram';
+          isMut: false;
+          isSigner: false;
         },
         {
           name: 'systemProgram';
@@ -55,12 +65,52 @@ type SolanaSolclan = {
           isSigner: false;
         },
         {
+          name: 'card';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'tokenAccount';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'metadata';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'masterEdition';
+          isMut: true;
+          isSigner: false;
+        },
+        {
           name: 'authority';
           isMut: true;
           isSigner: true;
         },
         {
+          name: 'tokenProgram';
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: 'associatedTokenProgram';
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: 'tokenMetadataProgram';
+          isMut: false;
+          isSigner: false;
+        },
+        {
           name: 'systemProgram';
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: 'rent';
           isMut: false;
           isSigner: false;
         },
@@ -171,6 +221,10 @@ type SolanaSolclan = {
           {
             name: 'power';
             type: 'u64';
+          },
+          {
+            name: 'card';
+            type: 'publicKey';
           },
           {
             name: 'name';
@@ -292,6 +346,11 @@ type SolanaSolclan = {
           index: false;
         },
         {
+          name: 'card';
+          type: 'publicKey';
+          index: false;
+        },
+        {
           name: 'name';
           type: 'string';
           index: false;
@@ -358,7 +417,7 @@ type SolanaSolclan = {
   ];
 };
 
-export const solClanIDL: SolanaSolclan = {
+export const IDL: SolanaSolclan = {
   version: '0.1.0',
   name: 'solana_solclan',
   instructions: [
@@ -376,9 +435,19 @@ export const solClanIDL: SolanaSolclan = {
           isSigner: false,
         },
         {
+          name: 'card',
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: 'authority',
           isMut: true,
           isSigner: true,
+        },
+        {
+          name: 'tokenProgram',
+          isMut: false,
+          isSigner: false,
         },
         {
           name: 'systemProgram',
@@ -415,12 +484,52 @@ export const solClanIDL: SolanaSolclan = {
           isSigner: false,
         },
         {
+          name: 'card',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'tokenAccount',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'metadata',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'masterEdition',
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: 'authority',
           isMut: true,
           isSigner: true,
         },
         {
+          name: 'tokenProgram',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'associatedTokenProgram',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'tokenMetadataProgram',
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: 'systemProgram',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'rent',
           isMut: false,
           isSigner: false,
         },
@@ -531,6 +640,10 @@ export const solClanIDL: SolanaSolclan = {
           {
             name: 'power',
             type: 'u64',
+          },
+          {
+            name: 'card',
+            type: 'publicKey',
           },
           {
             name: 'name',
@@ -649,6 +762,11 @@ export const solClanIDL: SolanaSolclan = {
         {
           name: 'power',
           type: 'u64',
+          index: false,
+        },
+        {
+          name: 'card',
+          type: 'publicKey',
           index: false,
         },
         {

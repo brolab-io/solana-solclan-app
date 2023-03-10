@@ -1,6 +1,5 @@
 import React, { ComponentProps, PropsWithChildren } from 'react';
-import { HStack, Pressable } from 'native-base';
-import { Image } from 'react-native';
+import { HStack, Image, Pressable } from 'native-base';
 import { ImageSourcePropType } from 'react-native/types';
 
 type Props = {
@@ -19,17 +18,18 @@ const Button: React.FC<PropsWithChildren<Props>> = ({
   return (
     <HStack
       w="100%"
-      space="2"
       justifyContent="center"
       alignItems="center"
       backgroundColor="blue.600"
-      py="3"
+      p="3"
       rounded="full"
       {...props}>
-      <Pressable alignItems="center" flexDirection="row" onPress={onPress}>
-        {leftIcon ? <Image source={leftIcon} alt="icon" /> : null}
-        {children}
-        {rightIcon ? <Image source={rightIcon} alt="icon" /> : null}
+      <Pressable onPress={onPress}>
+        <HStack space={props.space || 2} justifyContent="center" alignItems="center">
+          {leftIcon ? <Image source={leftIcon} alt="icon" w={7} h={7} /> : null}
+          {children}
+          {rightIcon ? <Image source={rightIcon} alt="icon" w={7} h={7} /> : null}
+        </HStack>
       </Pressable>
     </HStack>
   );
