@@ -2,11 +2,16 @@ import { Box, HStack, Image, Text, VStack } from 'native-base';
 import React, { PropsWithChildren } from 'react';
 import Button from './Button';
 
-const SentFund: React.FC<PropsWithChildren> = () => {
+type Props = {
+  onVoteForPress?: () => void;
+  onVoteAgainstPress?: () => void;
+};
+
+const SentFund: React.FC<PropsWithChildren<Props>> = ({ onVoteForPress, onVoteAgainstPress }) => {
   return (
-    <VStack pt="2" pb="5" space="3">
+    <VStack pt="2" space="3">
       <Text color="white" fontSize="md">
-        Invest on Solend private round
+        Return Accidentally Sent Funds
       </Text>
       <HStack w="100%" justifyContent="space-between" alignItems="center">
         <Button
@@ -52,13 +57,30 @@ const SentFund: React.FC<PropsWithChildren> = () => {
           rounded="full"
         />
         <VStack>
-          <Text color="white" fontSize="md">
+          <Text color="#4299E1" fontSize="md">
             0fx247sb784cvb2....qg8472bva
           </Text>
           <Text color="white" fontSize="md">
             Created 12:30 A.M 9/9/2021
           </Text>
         </VStack>
+      </HStack>
+      <HStack w="100%" space="3">
+        <Button flex={1} py="5" backgroundColor="#215BF0" rounded="2xl" onPress={onVoteForPress}>
+          <Text color="white" fontSize="md" fontWeight="bold">
+            Vote For
+          </Text>
+        </Button>
+        <Button
+          flex={1}
+          py="5"
+          backgroundColor="#F56565"
+          rounded="2xl"
+          onPress={onVoteAgainstPress}>
+          <Text color="white" fontSize="md" fontWeight="bold">
+            Vote Against
+          </Text>
+        </Button>
       </HStack>
     </VStack>
   );
