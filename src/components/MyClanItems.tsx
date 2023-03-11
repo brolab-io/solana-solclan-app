@@ -20,12 +20,14 @@ type Props = {
   }[];
   onTabSelected: (index: number) => void;
   tabSelected: number;
+  onItemPress: (id: string) => void;
 };
 
 const MyClanItems: React.FC<PropsWithChildren<Props>> = ({
   clanItems,
   tabSelected = 0,
   onTabSelected,
+  onItemPress,
 }) => {
   return (
     <VStack alignItems="center">
@@ -53,6 +55,7 @@ const MyClanItems: React.FC<PropsWithChildren<Props>> = ({
                 py="10px"
                 key={item.id}
                 position="relative"
+                onPress={() => onItemPress(item.id)}
                 w={`${widthDimensions(150, 20)}px`}>
                 <Image
                   rounded="3xl"

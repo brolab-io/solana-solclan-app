@@ -2,8 +2,10 @@ import Header from '@/components/Header';
 import Layout from '@/components/Layout';
 import MyClanItems from '@/components/MyClanItems';
 import UserInfo from '@/components/UserInfo';
+import { Routers } from '@/constants/Routers';
+import { useMyNavigation } from '@/navigator/Navigation';
 import { ScrollView, VStack } from 'native-base';
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 
 const bottomEdge: Edge[] = ['bottom'];
@@ -35,12 +37,22 @@ const clanItems = [
 ];
 
 const ProfileScreen: React.FC<PropsWithChildren> = () => {
+  const { navigate } = useMyNavigation();
+
   const [tabselected, setTabSelected] = useState(0);
 
   useEffect(() => {
     //Get data Clan or Proposal
     console.log('tabselected', tabselected);
   }, [tabselected]);
+
+  const onItemPress = useCallback(
+    (id: string) => {
+      console.log('id', id);
+      navigate(Routers.ClanHistoryScreen);
+    },
+    [navigate],
+  );
 
   return (
     <Layout>
@@ -53,6 +65,7 @@ const ProfileScreen: React.FC<PropsWithChildren> = () => {
               clanItems={clanItems}
               tabSelected={tabselected}
               onTabSelected={setTabSelected}
+              onItemPress={onItemPress}
             />
           </SafeAreaView>
         </ScrollView>
