@@ -8,7 +8,7 @@ import React, { useCallback } from 'react';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 
 const edges: Edge[] = ['bottom'];
-const ClanHistory = () => {
+const ClanHistory: React.FC = () => {
   const onVoteForPress = useCallback(() => {
     console.log('onVoteForPress');
   }, []);

@@ -9,11 +9,18 @@ import dot_icon from '../assets/dot_icon.png';
 
 type Props = {
   tabselected: number;
-  onJoinOrDeposit: () => void;
   isLoadingMember: boolean;
   hasJoined: boolean;
+  onJoinOrDeposit: () => void;
+  addNewProposal: () => void;
 };
-const ClanDetailTab = ({ tabselected, onJoinOrDeposit, isLoadingMember, hasJoined }: Props) => {
+const ClanDetailTab = ({
+  tabselected,
+  isLoadingMember,
+  hasJoined,
+  onJoinOrDeposit,
+  addNewProposal,
+}: Props) => {
   return (
     <VStack>
       {tabselected === 0 ? (
@@ -134,8 +141,8 @@ const ClanDetailTab = ({ tabselected, onJoinOrDeposit, isLoadingMember, hasJoine
       {tabselected === 3 ? (
         <VStack>
           <HStack borderBottomColor="#2D3748" borderBottomWidth="1" pb="5">
-            <Button w="80%" onPress={() => null} leftIcon={plus_icon}>
-              <Text color="white" fontSize="xl" fontWeight="bold">
+            <Button w="80%" onPress={addNewProposal} leftIcon={plus_icon}>
+              <Text color="white" fontSize="md" fontWeight="bold">
                 Add A New Proposals
               </Text>
             </Button>
