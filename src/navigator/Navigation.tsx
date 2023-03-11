@@ -20,6 +20,7 @@ import ClanDetailScreen from '@/app/home/ClanDetail';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import CreateClanScreen from '@/app/create-clan/CreateClan';
 import { ClanData } from '@/configs/programs';
+import ClanHistoryScreen from '@/app/clan-history/History';
 
 const AppStack = createStackNavigator<MyParamList>();
 
@@ -29,6 +30,7 @@ type MyParamList = {
   [Routers.CreateClanScreen]: undefined;
   [Routers.ClanDetailScreen]: { item: ClanData };
   [Routers.ProfileScreen]: undefined;
+  [Routers.ClanHistoryScreen]: undefined;
 };
 
 export const useMyRoute = <T extends keyof MyParamList>() => {
@@ -79,6 +81,13 @@ const AppRouters: MyRouteConfig[] = [
   {
     name: Routers.CreateClanScreen,
     component: CreateClanScreen,
+    options: {
+      headerShown: false,
+    },
+  },
+  {
+    name: Routers.ClanHistoryScreen,
+    component: ClanHistoryScreen,
     options: {
       headerShown: false,
     },
