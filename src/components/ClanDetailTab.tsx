@@ -1,30 +1,19 @@
-import { Box, HStack, Image, Text, VStack, Button as NativeBaseButton } from 'native-base';
+import { HStack, Image, Text, VStack, Button as NativeBaseButton } from 'native-base';
 import React from 'react';
-import Button from './Button';
 import DepositActionSheet from './DepositActionSheet';
 
-import plus_icon from '../assets/plus_icon.png';
-import check_icon from '../assets/check_icon.png';
-import dot_icon from '../assets/dot_icon.png';
 import { ClanData } from '@/configs/programs';
 import { formatSOL } from '@/lib/solana/utils';
+import TabProposalList from './ClanDetail/TabProposalList';
 
 type Props = {
   tabselected: number;
-  isLoadingMember: boolean;
+  isLoading: boolean;
   hasJoined: boolean;
   item: ClanData;
-  addNewProposal: () => void;
   onJoinOrDeposit: () => void;
 };
-const ClanDetailTab = ({
-  tabselected,
-  isLoadingMember,
-  hasJoined,
-  item,
-  onJoinOrDeposit,
-  addNewProposal,
-}: Props) => {
+const ClanDetailTab = ({ tabselected, isLoading, hasJoined, item, onJoinOrDeposit }: Props) => {
   return (
     <VStack>
       {tabselected === 0 ? (
@@ -61,15 +50,15 @@ const ClanDetailTab = ({
             ) : null}
           </HStack>
           <NativeBaseButton
-            disabled={isLoadingMember}
-            isLoading={isLoadingMember}
+            disabled={isLoading}
+            isLoading={isLoading}
             rounded="full"
             height="56px"
             mb="5"
             bg="#2F80ED"
             onPress={onJoinOrDeposit}>
             <Text color="white" fontSize="xl" fontWeight="bold">
-              {isLoadingMember ? 'Checking...' : hasJoined ? 'Deposit' : 'Join Clan'}
+              {isLoading ? 'Checking...' : hasJoined ? 'Deposit' : 'Join Clan'}
             </Text>
           </NativeBaseButton>
         </VStack>
@@ -142,96 +131,7 @@ const ClanDetailTab = ({
           </VStack>
         </HStack>
       ) : null}
-      {tabselected === 3 ? (
-        <VStack>
-          <HStack borderBottomColor="#2D3748" borderBottomWidth="1" pb="5">
-            <Button w="80%" onPress={addNewProposal} leftIcon={plus_icon}>
-              <Text color="white" fontSize="md" fontWeight="bold">
-                Add A New Proposals
-              </Text>
-            </Button>
-          </HStack>
-          <VStack borderBottomColor="#2D3748" borderBottomWidth="1" pt="2" pb="5" space="3">
-            <Text color="white" fontSize="md">
-              We should invite more people
-            </Text>
-            <HStack w="100%" justifyContent="space-between">
-              <Button
-                w="30%"
-                py="1"
-                backgroundColor="transparent"
-                borderWidth="1"
-                borderColor="#1AC486"
-                rounded="14">
-                <Text color="#1AC486" fontSize="md" fontWeight="bold">
-                  Passed
-                </Text>
-              </Button>
-              <Button w="20%" backgroundColor="#4A5568" rounded="14" py="1">
-                <Text color="white" fontSize="md" fontWeight="bold">
-                  058
-                </Text>
-              </Button>
-              <Box w="1%" my="1" borderLeftColor="#4A5568" borderLeftWidth="1" />
-
-              <Button
-                w="30%"
-                space="4"
-                backgroundColor="transparent"
-                rounded="14"
-                leftIcon={check_icon}
-                py="1">
-                <Text color="#1AC486" fontSize="md" fontWeight="bold">
-                  Executed
-                </Text>
-              </Button>
-            </HStack>
-            <Text color="#718096" fontSize="md" fontWeight="bold">
-              12:30 A.M 8/3/2023
-            </Text>
-          </VStack>
-
-          <VStack borderBottomColor="#2D3748" borderBottomWidth="1" pt="2" pb="5" space="3">
-            <Text color="white" fontSize="md">
-              Invest on Solend private round
-            </Text>
-            <HStack w="100%" justifyContent="space-between">
-              <Button
-                w="30%"
-                py="1"
-                backgroundColor="transparent"
-                borderWidth="1"
-                borderColor="#805AD5"
-                rounded="14">
-                <Text color="#805AD5" fontSize="md" fontWeight="bold">
-                  Running
-                </Text>
-              </Button>
-              <Button w="20%" backgroundColor="#4A5568" rounded="14" py="1">
-                <Text color="white" fontSize="md" fontWeight="bold">
-                  058
-                </Text>
-              </Button>
-              <Box w="1%" my="1" borderLeftColor="#4A5568" borderLeftWidth="1" />
-
-              <Button
-                w="30%"
-                space="4"
-                backgroundColor="transparent"
-                rounded="14"
-                leftIcon={dot_icon}
-                py="1">
-                <Text color="#805AD5" fontSize="md" fontWeight="bold">
-                  Queue
-                </Text>
-              </Button>
-            </HStack>
-            <Text color="#718096" fontSize="md" fontWeight="bold">
-              12:30 A.M 9/9/2021
-            </Text>
-          </VStack>
-        </VStack>
-      ) : null}
+      {tabselected === 3 ? <TabProposalList item={item} /> : null}
       <DepositActionSheet id={item.id} />
     </VStack>
   );

@@ -49,3 +49,26 @@ export const findTreasurerAccount = (clanAccount: PublicKey) => {
     SOLCLAN_PROGRAM_ID,
   )[0];
 };
+
+export const findProposalAccount = (
+  proposalId: BN,
+  clanAccount: PublicKey,
+  walletAccount: PublicKey,
+) => {
+  return findProgramAddressSync(
+    [
+      Buffer.from('proposal'),
+      proposalId.toArrayLike(Buffer, 'le', 8),
+      clanAccount.toBuffer(),
+      walletAccount.toBuffer(),
+    ],
+    SOLCLAN_PROGRAM_ID,
+  )[0];
+};
+
+export const findVaultAccount = (proposalAccount: PublicKey, proposalAuthorAccount: PublicKey) => {
+  return findProgramAddressSync(
+    [Buffer.from('vault'), proposalAccount.toBuffer(), proposalAuthorAccount.toBuffer()],
+    SOLCLAN_PROGRAM_ID,
+  )[0];
+};

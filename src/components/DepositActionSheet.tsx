@@ -1,7 +1,7 @@
-import React, { PropsWithChildren, useCallback } from 'react';
+import React, { PropsWithChildren, useCallback, useState } from 'react';
 import { ACTION_SHEET } from '@/constants/ActionSheet';
 import { Button, HStack, Text, VStack } from 'native-base';
-import ActionSheet from 'react-native-actions-sheet';
+import ActionSheet, { SheetManager } from 'react-native-actions-sheet';
 import { StyleSheet } from 'react-native';
 import MyInput from './Input';
 import useDepositMutation from '@/hooks/mutations/useDepositMutation';
@@ -15,7 +15,7 @@ type Props = {
 };
 
 const DepositActionSheet: React.FC<PropsWithChildren<Props>> = ({ id }) => {
-  const [value, setValue] = React.useState<string>('');
+  const [value, setValue] = useState<string>('');
 
   const { mutateAsync: deposit, isLoading: isDepositing } = useDepositMutation();
 
@@ -24,7 +24,6 @@ const DepositActionSheet: React.FC<PropsWithChildren<Props>> = ({ id }) => {
   }, []);
 
   const handleDeposit = useCallback(async () => {
-    console.log('Handle deposit', value, 'to', id);
     const amount = new BN(parseFloat(value)).mul(new BN(LAMPORTS_PER_SOL));
     console.log(`Deposit ${value} (${amount}) to clan ${id}`);
     try {
@@ -33,6 +32,7 @@ const DepositActionSheet: React.FC<PropsWithChildren<Props>> = ({ id }) => {
         amount,
       });
       queryClient.invalidateQueries(['clan', id.toString()]);
+      SheetManager.hide(ACTION_SHEET.DEPOSIT);
     } catch (error) {
       console.log(error);
     }
@@ -61,7 +61,7 @@ const DepositActionSheet: React.FC<PropsWithChildren<Props>> = ({ id }) => {
             w="25%"
             ml="auto"
             onPress={doNothing}
-            isLoading={isDepositing}
+            disabled={isDepositing}
             isLoadingText="Depositing"
             rounded="full"
             backgroundColor="transparent"

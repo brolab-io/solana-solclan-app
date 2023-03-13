@@ -14,6 +14,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AppNavigator } from './src/navigator/Navigation';
 import { SolanaProvider } from '@/lib/solana';
 import { queryClient } from '@/configs/query.client';
+import DialogContainer from '@/components/Dialog/DialogContainer';
 
 const App: React.FC = () => {
   return (
@@ -43,6 +44,7 @@ function RootApp(): JSX.Element {
     <QueryClientProvider client={queryClient}>
       <NativeBaseProvider config={config}>
         <App />
+        <DialogContainer />
       </NativeBaseProvider>
     </QueryClientProvider>
   );
