@@ -1,24 +1,44 @@
 import { BN } from '@project-serum/anchor';
 import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey';
-import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
+import { METADATA_PROGRAM_ID, SOLCLAN_PROGRAM_ID } from './programs';
 
 export const findClanAccount = (clanId: BN) => {
   return findProgramAddressSync(
     [Buffer.from('clan'), clanId.toArrayLike(Buffer, 'le', 8)],
-    SystemProgram.programId,
+    SOLCLAN_PROGRAM_ID,
   )[0];
 };
 
 export const findClanMemberAccount = (clanAccount: PublicKey, publicKey: PublicKey) => {
   return findProgramAddressSync(
     [Buffer.from('member'), clanAccount.toBuffer(), publicKey.toBuffer()],
-    SystemProgram.programId,
+    SOLCLAN_PROGRAM_ID,
   )[0];
 };
 
-export const findClanCardAccount = (clanAccount: PublicKey) => {
+export const findClanCardAccount = (clanAccount: PublicKey, publicKey: PublicKey) => {
   return findProgramAddressSync(
-    [Buffer.from('card'), clanAccount.toBuffer()],
-    SystemProgram.programId,
+    [Buffer.from('card'), clanAccount.toBuffer(), publicKey.toBuffer()],
+    SOLCLAN_PROGRAM_ID,
+  )[0];
+};
+
+export const findMetadataAccount = (mintAccount: PublicKey) => {
+  return findProgramAddressSync(
+    [Buffer.from('metadata'), METADATA_PROGRAM_ID.toBuffer(), mintAccount.toBuffer()],
+    METADATA_PROGRAM_ID,
+  )[0];
+};
+
+export const findMasterEditionAccount = (mintAccount: PublicKey) => {
+  return findProgramAddressSync(
+    [
+      Buffer.from('metadata'),
+      METADATA_PROGRAM_ID.toBuffer(),
+      mintAccount.toBuffer(),
+      Buffer.from('edition'),
+    ],
+    METADATA_PROGRAM_ID,
   )[0];
 };

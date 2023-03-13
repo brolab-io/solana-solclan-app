@@ -15,6 +15,8 @@ import { solClanIDL, solClanProgramId } from '@/configs/programs';
 import { findClanAccount, findClanMemberAccount } from '@/configs/pdas';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import { useQuery } from '@tanstack/react-query';
+import useJoinClanMutation from '@/hooks/mutations/useJoinClanMutation';
+import { checkIsMemberOfClan } from '@/lib/solana/utils';
 
 const tabData: ButtonType[] = [
   {
@@ -41,6 +43,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
   const {
     params: { item },
   } = useMyRoute<Routers.ClanDetailScreen>();
+  const { mutateAsync: joinClan } = useJoinClanMutation();
 
   const memberAccount = useMemo(() => {
     if (!publicKey) {
@@ -53,29 +56,27 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
   const {
     data: member,
     isLoading: isLoadingMember,
-    error,
-  } = useQuery(['clanMember', memberAccount], async () => {
-    if (!memberAccount) {
-      return null;
-    }
-    return await program.account.member.fetch(memberAccount);
-  });
-
-  const hasJoined = useMemo(() => {
-    if (!member) {
-      return false;
-    }
-    if (error instanceof Error && error.message.includes('Account does not exist or has no data')) {
-      return false;
-    }
-    return true;
-  }, [error, member]);
-
-  const onJoinOrDeposit = useCallback(() => {
+    refetch: refetchMember,
+  } = useQuery(
+    ['clanMember', memberAccount],
+    () => {
+      return checkIsMemberOfClan(program, memberAccount!, publicKey!);
+    },
+    {
+      enabled: !!memberAccount && !!publicKey,
+    },
+  );
+  const hasJoined = !!member;
+  const onJoinOrDeposit = useCallback(async () => {
     if (hasJoined) {
       SheetManager.show(ACTION_SHEET.DEPOSIT);
+    } else {
+      await joinClan({
+        id: item.id,
+      });
+      await refetchMember();
     }
-  }, [hasJoined]);
+  }, [hasJoined, item.id, joinClan, refetchMember]);
 
   const addNewProposal = useCallback(() => {
     navigate(Routers.CreateProposalScreen);
@@ -103,6 +104,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
                 isLoadingMember={isLoadingMember}
                 hasJoined={hasJoined}
                 tabselected={selected}
+                item={item}
                 onJoinOrDeposit={onJoinOrDeposit}
                 addNewProposal={addNewProposal}
               />

@@ -65,7 +65,7 @@ const useProgram = <T extends Idl>(idl: T, programID: string) => {
         signAllTransactions,
         signTransaction,
       },
-      { commitment: 'processed' },
+      { commitment: 'confirmed' },
     );
 
     const program = new Program(idl, new PublicKey(programID), provider);

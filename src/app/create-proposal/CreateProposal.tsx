@@ -5,7 +5,7 @@ import Layout from '@/components/Layout';
 import { Box, HStack, ScrollView, Text, VStack } from 'native-base';
 import React, { useCallback } from 'react';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
-const calen_icon = require('@/assets/calen_icon.png');
+import calen_icon from '@/assets/calen_icon.png';
 
 const edges: Edge[] = ['bottom'];
 const CreateProposal: React.FC = () => {

@@ -1,5 +1,5 @@
 import { ClanData } from '@/configs/programs';
-import { formatPublicKey } from '@/lib/solana/utils';
+import { formatPublicKey, formatSOL } from '@/lib/solana/utils';
 import { Box, HStack, Image, Pressable, Text, VStack } from 'native-base';
 import React from 'react';
 
@@ -59,7 +59,7 @@ const CardItem: React.FC<CardItemProps> = ({ onPress, item }: CardItemProps) => 
                 borderRadius="full"
               />
               <Text color="white" fontSize="md">
-                {0} SOL
+                {formatSOL(item.power)} SOL
               </Text>
             </HStack>
           </VStack>

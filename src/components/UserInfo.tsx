@@ -1,3 +1,5 @@
+import usePublicKey from '@/lib/solana/hooks/usePublicKey';
+import { formatPublicKey } from '@/lib/solana/utils';
 import { Box, HStack, Image, Text, VStack } from 'native-base';
 import React, { PropsWithChildren } from 'react';
 
@@ -5,16 +7,17 @@ type Props = {
   data: any;
 };
 const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data }) => {
+  const publicKey = usePublicKey();
   return (
     <VStack px="5" mt="10" space="5">
       <HStack space="5" alignItems="center">
         <Image src={data.avatar} alt="avatar" w="32" h="32" rounded="full" />
         <VStack>
           <Text color="white" fontSize="2xl">
-            {data.name}
+            {publicKey ? formatPublicKey(publicKey) : 'Anonymous'}
           </Text>
           <Text color="white" fontSize="md">
-            {data.nick_name}
+            {publicKey ? formatPublicKey(publicKey) : 'anonymous'}
           </Text>
         </VStack>
       </HStack>
