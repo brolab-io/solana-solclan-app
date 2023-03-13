@@ -4,13 +4,39 @@ import { Button, HStack, Text, VStack } from 'native-base';
 import ActionSheet from 'react-native-actions-sheet';
 import { StyleSheet } from 'react-native';
 import MyInput from './Input';
+import useDepositMutation from '@/hooks/mutations/useDepositMutation';
+import { BN } from '@project-serum/anchor';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { queryClient } from '@/configs/query.client';
+import { doNothing } from '@/lib/solana/utils';
 
-const DepositActionSheet: React.FC<PropsWithChildren> = () => {
+type Props = {
+  id: BN;
+};
+
+const DepositActionSheet: React.FC<PropsWithChildren<Props>> = ({ id }) => {
   const [value, setValue] = React.useState<string>('');
+
+  const { mutateAsync: deposit, isLoading: isDepositing } = useDepositMutation();
 
   const onValueChange = useCallback((text: string | Date) => {
     setValue(text.toString());
   }, []);
+
+  const handleDeposit = useCallback(async () => {
+    console.log('Handle deposit', value, 'to', id);
+    const amount = new BN(parseFloat(value)).mul(new BN(LAMPORTS_PER_SOL));
+    console.log(`Deposit ${value} (${amount}) to clan ${id}`);
+    try {
+      await deposit({
+        id,
+        amount,
+      });
+      queryClient.invalidateQueries(['clan', id.toString()]);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [deposit, id, value]);
 
   return (
     <ActionSheet
@@ -34,7 +60,9 @@ const DepositActionSheet: React.FC<PropsWithChildren> = () => {
           <Button
             w="25%"
             ml="auto"
-            onPress={() => null}
+            onPress={doNothing}
+            isLoading={isDepositing}
+            isLoadingText="Depositing"
             rounded="full"
             backgroundColor="transparent"
             borderColor="#4C5172"
@@ -43,7 +71,13 @@ const DepositActionSheet: React.FC<PropsWithChildren> = () => {
               Cancel
             </Text>
           </Button>
-          <Button w="35%" onPress={() => null} rounded="full" backgroundColor="#215BF0">
+          <Button
+            isLoading={isDepositing}
+            isLoadingText="Depositing"
+            w="35%"
+            onPress={handleDeposit}
+            rounded="full"
+            backgroundColor="#215BF0">
             <Text color="white" fontSize="md" fontWeight="bold">
               Deposit
             </Text>

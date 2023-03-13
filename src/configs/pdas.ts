@@ -42,3 +42,10 @@ export const findMasterEditionAccount = (mintAccount: PublicKey) => {
     METADATA_PROGRAM_ID,
   )[0];
 };
+
+export const findTreasurerAccount = (clanAccount: PublicKey) => {
+  return findProgramAddressSync(
+    [Buffer.from('treasurer'), clanAccount.toBuffer()],
+    SOLCLAN_PROGRAM_ID,
+  )[0];
+};

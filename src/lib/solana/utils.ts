@@ -93,6 +93,8 @@ export const waitForTransactionSignatureConfirmation = async (
   );
 };
 
+export const doNothing = () => {};
+
 export const Linking = {
   openURL: RNLinking.openURL.bind(RNLinking),
   addEventListener: RNLinking.addEventListener.bind(RNLinking),
