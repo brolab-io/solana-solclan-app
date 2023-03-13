@@ -9,7 +9,7 @@ import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 import { SheetManager } from 'react-native-actions-sheet';
 import { ACTION_SHEET } from '@/constants/ActionSheet';
 import { Routers } from '@/constants/Routers';
-import { useMyNavigation, useMyRoute } from '@/navigator/Navigation';
+import { useMyRoute } from '@/navigator/Navigation';
 import useProgram from '@/lib/solana/hooks/useProgram';
 import { solClanIDL, solClanProgramId } from '@/configs/programs';
 import { findClanAccount } from '@/configs/pdas';
@@ -36,7 +36,6 @@ const tabData: ButtonType[] = [
 const bottomEdge: Edge[] = ['bottom'];
 
 const ClanDetail: React.FC<PropsWithChildren> = () => {
-  const { navigate } = useMyNavigation();
   const [selected, setSelected] = useState(0);
   const publicKey = usePublicKey();
   const { program } = useProgram(solClanIDL, solClanProgramId);
@@ -55,7 +54,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
     },
   );
 
-  const { mutateAsync: joinClan } = useJoinClanMutation();
+  const { mutateAsync: joinClan, isLoading: isJoiningClan } = useJoinClanMutation();
 
   const clanAccount = useMemo(() => {
     if (!publicKey) {
@@ -69,7 +68,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
     isLoading: isLoadingMember,
     refetch: refetchMember,
   } = useQuery(
-    ['clanMember', clanAccount],
+    ['clanMember', clanAccount?.toBase58()],
     () => {
       return checkIsMemberOfClan(program, clanAccount!, publicKey!);
     },
@@ -88,10 +87,6 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
       await refetchMember();
     }
   }, [hasJoined, clan.id, joinClan, refetchMember]);
-
-  const addNewProposal = useCallback(() => {
-    navigate(Routers.CreateProposalScreen);
-  }, [navigate]);
 
   return (
     <Layout>
@@ -112,12 +107,11 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
                 onChangeTab={setSelected}
               />
               <ClanDetailTab
-                isLoadingMember={isLoadingMember}
+                isLoading={isLoadingMember || isJoiningClan}
                 hasJoined={hasJoined}
                 tabselected={selected}
                 item={clan}
                 onJoinOrDeposit={onJoinOrDeposit}
-                addNewProposal={addNewProposal}
               />
             </VStack>
           </SafeAreaView>

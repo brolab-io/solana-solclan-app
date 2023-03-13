@@ -3,10 +3,11 @@ import React, { useCallback } from 'react';
 import { ImageSourcePropType, KeyboardTypeOptions, Platform } from 'react-native';
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
-type Props = {
+type InputValueType = string | Date;
+type Props<T extends InputValueType> = {
   type?: 'select' | 'input' | 'date';
   title: string;
-  value: string | Date;
+  value: T;
   placeholder: string;
   isMultiLine?: boolean;
   keyboardType?: KeyboardTypeOptions;
@@ -16,9 +17,9 @@ type Props = {
     label: string;
     value: string;
   }[];
-  onChange: (value: string | Date) => void;
+  onChange: (value: T) => void;
 };
-const MyInput: React.FC<Props> = ({
+const MyInput = <T extends InputValueType>({
   type = 'input',
   title,
   value,
@@ -29,8 +30,10 @@ const MyInput: React.FC<Props> = ({
   rightIcon,
   selectData,
   onChange,
-}) => {
+}: Props<T>) => {
   const [isShow, setIsShow] = React.useState(false);
+
+  const handleChange = useCallback((v: string) => onChange(v as unknown as T), [onChange]);
 
   const onDatePress = useCallback(() => {
     if (type === 'date') {
@@ -43,13 +46,13 @@ const MyInput: React.FC<Props> = ({
           is24Hour: true,
           onChange: (_, date) => {
             if (date) {
-              onChange(date);
+              handleChange(date as unknown as any);
             }
           },
         });
       }
     }
-  }, [onChange, type]);
+  }, [handleChange, type]);
 
   return (
     <VStack space="3">
@@ -75,7 +78,7 @@ const MyInput: React.FC<Props> = ({
               placeholder={placeholder}
               isDisabled={type === 'date'}
               value={value.toString()}
-              onChangeText={onChange}
+              onChangeText={handleChange}
             />
           ) : (
             <TextArea
@@ -88,7 +91,7 @@ const MyInput: React.FC<Props> = ({
               placeholder={placeholder}
               numberOfLines={7}
               value={value.toString()}
-              onChangeText={onChange}
+              onChangeText={handleChange}
             />
           )
         ) : null}
@@ -110,7 +113,7 @@ const MyInput: React.FC<Props> = ({
               borderTopRightRadius: 40,
               paddingBottom: 20,
             }}
-            onValueChange={onChange}>
+            onValueChange={handleChange}>
             {selectData?.map(item => {
               return (
                 <Select.Item
@@ -141,12 +144,12 @@ const MyInput: React.FC<Props> = ({
       {isShow && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date()}
+          value={value as unknown as Date}
           mode="date"
           is24Hour={true}
           onChange={(_, date) => {
             if (date) {
-              onChange(date);
+              handleChange(date as unknown as any);
             }
           }}
         />
