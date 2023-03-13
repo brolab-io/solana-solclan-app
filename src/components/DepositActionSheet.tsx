@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useCallback } from 'react';
 import { ACTION_SHEET } from '@/constants/ActionSheet';
 import { Button, HStack, Text, VStack } from 'native-base';
 import ActionSheet from 'react-native-actions-sheet';
@@ -6,6 +6,12 @@ import { StyleSheet } from 'react-native';
 import MyInput from './Input';
 
 const DepositActionSheet: React.FC<PropsWithChildren> = () => {
+  const [value, setValue] = React.useState<string>('');
+
+  const onValueChange = useCallback((text: string | Date) => {
+    setValue(text.toString());
+  }, []);
+
   return (
     <ActionSheet
       id={ACTION_SHEET.DEPOSIT}
@@ -16,6 +22,8 @@ const DepositActionSheet: React.FC<PropsWithChildren> = () => {
       gestureEnabled={true}>
       <VStack p="5" space="5">
         <MyInput
+          value={value}
+          onChange={onValueChange}
           title=" Enter deposit amount"
           placeholder="Type deposit amount here"
           rightText="SOL"
