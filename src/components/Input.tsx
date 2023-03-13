@@ -1,25 +1,56 @@
-import { HStack, Image, Input, Text, TextArea, VStack, Select } from 'native-base';
-import React from 'react';
-import { ImageSourcePropType, KeyboardTypeOptions } from 'react-native';
+import { HStack, Image, Input, Text, TextArea, VStack, Select, Pressable } from 'native-base';
+import React, { useCallback } from 'react';
+import { ImageSourcePropType, KeyboardTypeOptions, Platform } from 'react-native';
+import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 type Props = {
   type?: 'select' | 'input' | 'date';
-  isMultiLine?: boolean;
   title: string;
+  value: string | Date;
   placeholder: string;
+  isMultiLine?: boolean;
   keyboardType?: KeyboardTypeOptions;
   rightText?: string;
   rightIcon?: ImageSourcePropType;
+  selectData?: {
+    label: string;
+    value: string;
+  }[];
+  onChange: (value: string | Date) => void;
 };
 const MyInput: React.FC<Props> = ({
   type = 'input',
-  isMultiLine = false,
   title,
+  value,
   placeholder,
+  isMultiLine = false,
   keyboardType = 'default',
   rightText,
   rightIcon,
+  selectData,
+  onChange,
 }) => {
+  const [isShow, setIsShow] = React.useState(false);
+
+  const onDatePress = useCallback(() => {
+    if (type === 'date') {
+      if (Platform.OS === 'ios') {
+        setIsShow(true);
+      } else {
+        DateTimePickerAndroid.open({
+          value: new Date(),
+          mode: 'date',
+          is24Hour: true,
+          onChange: (_, date) => {
+            if (date) {
+              onChange(date);
+            }
+          },
+        });
+      }
+    }
+  }, [onChange, type]);
+
   return (
     <VStack space="3">
       <Text color="white" fontSize="xl">
@@ -32,7 +63,7 @@ const MyInput: React.FC<Props> = ({
         space="2"
         backgroundColor="#2D3748"
         rounded={isMultiLine ? 'xl' : 'full'}>
-        {type === 'input' ? (
+        {type === 'input' || type === 'date' ? (
           !isMultiLine ? (
             <Input
               keyboardType={keyboardType}
@@ -42,6 +73,9 @@ const MyInput: React.FC<Props> = ({
               fontSize="md"
               backgroundColor="transparent"
               placeholder={placeholder}
+              isDisabled={type === 'date'}
+              value={value.toString()}
+              onChangeText={onChange}
             />
           ) : (
             <TextArea
@@ -53,6 +87,8 @@ const MyInput: React.FC<Props> = ({
               backgroundColor="transparent"
               placeholder={placeholder}
               numberOfLines={7}
+              value={value.toString()}
+              onChangeText={onChange}
             />
           )
         ) : null}
@@ -60,41 +96,33 @@ const MyInput: React.FC<Props> = ({
         {type === 'select' ? (
           <Select
             borderWidth={0}
+            w="100%"
+            selectedValue={value.toString()}
+            minWidth="100%"
             backgroundColor="transparent"
-            selectedValue={'ux'}
             accessibilityLabel="Choose Service"
             placeholder={placeholder}
+            fontSize="md"
+            color="white"
             _actionSheetContent={{
               backgroundColor: 'rgba(26, 32, 44, 1)',
               borderTopLeftRadius: 40,
               borderTopRightRadius: 40,
               paddingBottom: 20,
             }}
-            onValueChange={itemValue => console.log(itemValue)}>
-            <Select.Item
-              label="UX Research"
-              value="ux"
-              backgroundColor="transparent"
-              _text={{
-                color: 'white',
-              }}
-            />
-            <Select.Item
-              label="Cross Platform Development"
-              value="cross"
-              backgroundColor="transparent"
-              _text={{
-                color: 'white',
-              }}
-            />
-            <Select.Item
-              label="Backend Development"
-              value="backend"
-              backgroundColor="transparent"
-              _text={{
-                color: 'white',
-              }}
-            />
+            onValueChange={onChange}>
+            {selectData?.map(item => {
+              return (
+                <Select.Item
+                  label={item.label}
+                  value={item.value}
+                  backgroundColor="transparent"
+                  _text={{
+                    color: 'white',
+                  }}
+                />
+              );
+            })}
           </Select>
         ) : null}
 
@@ -105,9 +133,24 @@ const MyInput: React.FC<Props> = ({
         ) : null}
 
         {rightIcon ? (
-          <Image source={rightIcon} alt="icon date" ml="auto" mr="2" w="6" h="6" />
+          <Pressable onPress={onDatePress} ml="auto" mr="2">
+            <Image source={rightIcon} alt="icon date" w="6" h="6" />
+          </Pressable>
         ) : null}
       </HStack>
+      {isShow && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={new Date()}
+          mode="date"
+          is24Hour={true}
+          onChange={(_, date) => {
+            if (date) {
+              onChange(date);
+            }
+          }}
+        />
+      )}
     </VStack>
   );
 };
