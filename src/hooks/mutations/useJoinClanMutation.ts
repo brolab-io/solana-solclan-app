@@ -10,29 +10,26 @@ import useConnection from '@/lib/solana/hooks/useConnection';
 import useProgram from '@/lib/solana/hooks/useProgram';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import useSignAndSendTransaction from '@/lib/solana/hooks/useSignAndSendTransaction';
+import { BN } from '@project-serum/anchor';
+import { SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
+import { useMutation } from '@tanstack/react-query';
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddress,
+} from '@solana/spl-token';
+import { PROGRAM_ADDRESS } from '@metaplex-foundation/mpl-token-metadata';
 import {
   addPriorityFee,
   modifyComputeUnits,
   waitForTransactionSignatureConfirmation,
 } from '@/lib/solana/utils';
-import { PROGRAM_ADDRESS } from '@metaplex-foundation/mpl-token-metadata/dist/src/generated';
-import { BN } from '@project-serum/anchor';
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddress,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token';
-import { SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
-import { useMutation } from '@tanstack/react-query';
 
 type Payload = {
   id: BN;
-  name: string;
-  email: string;
-  description: string;
 };
 
-const useCreateClanMutation = () => {
+const useJoinClanMutation = () => {
   const publicKey = usePublicKey();
   const { program } = useProgram(solClanIDL, solClanProgramId);
   const connection = useConnection();
@@ -42,24 +39,19 @@ const useCreateClanMutation = () => {
     if (!publicKey) {
       return Promise.reject('Please connect your wallet');
     }
-    // payload.id = new BN('112233');
     const clanAccount = findClanAccount(payload.id);
     const memberAccount = findClanMemberAccount(clanAccount, publicKey);
     const cardAccount = findClanCardAccount(clanAccount, publicKey);
-    const associatedTokenAddress = await getAssociatedTokenAddress(cardAccount, publicKey);
     const metadataAccount = findMetadataAccount(cardAccount);
     const masterEditionAccount = findMasterEditionAccount(cardAccount);
 
+    const associatedTokenAddress = await getAssociatedTokenAddress(cardAccount, publicKey);
+
     const tx = await program.methods
-      .createClan(
-        payload.id,
-        payload.name,
-        'TEST',
-        'https://arweave.net/HK4OdYYja7UJRpc3Iw0VYCFiqkAMNi0tbFKr42Qgcjc',
-      )
+      .joinClan(clanAccount)
       .accounts({
-        clan: clanAccount,
         member: memberAccount,
+        clan: clanAccount,
         card: cardAccount,
         tokenAccount: associatedTokenAddress,
         metadata: metadataAccount,
@@ -75,14 +67,11 @@ const useCreateClanMutation = () => {
       .transaction();
 
     tx.feePayer = publicKey;
-
-    const latestBlockHash = await connection.getLatestBlockhash();
-    tx.recentBlockhash = latestBlockHash.blockhash;
+    tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
     const txResult = await signAndSendTransaction(tx);
     await waitForTransactionSignatureConfirmation(connection, txResult);
-
     return await program.account.clan.fetch(clanAccount);
   });
 };
 
-export default useCreateClanMutation;
+export default useJoinClanMutation;

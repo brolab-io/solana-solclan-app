@@ -15,6 +15,7 @@ import { solClanIDL, solClanProgramId } from '@/configs/programs';
 import { findClanAccount, findClanMemberAccount } from '@/configs/pdas';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import { useQuery } from '@tanstack/react-query';
+import useJoinClanMutation from '@/hooks/mutations/useJoinClanMutation';
 
 const tabData: ButtonType[] = [
   {
@@ -40,6 +41,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
   const {
     params: { item },
   } = useMyRoute<Routers.ClanDetailScreen>();
+  const { mutateAsync: joinClan } = useJoinClanMutation();
 
   const memberAccount = useMemo(() => {
     if (!publicKey) {
@@ -53,6 +55,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
     data: member,
     isLoading: isLoadingMember,
     error,
+    refetch: refetchMember,
   } = useQuery(['clanMember', memberAccount], async () => {
     if (!memberAccount) {
       return null;
@@ -61,20 +64,28 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
   });
 
   const hasJoined = useMemo(() => {
+    // Account exists but has no data
     if (!member) {
       return false;
     }
+    // Acount does not exist
     if (error instanceof Error && error.message.includes('Account does not exist or has no data')) {
       return false;
     }
+    // Account exists and has data
     return true;
   }, [error, member]);
 
-  const onJoinOrDeposit = useCallback(() => {
+  const onJoinOrDeposit = useCallback(async () => {
     if (hasJoined) {
       SheetManager.show(ACTION_SHEET.DEPOSIT);
+    } else {
+      await joinClan({
+        id: item.id,
+      });
+      await refetchMember();
     }
-  }, [hasJoined]);
+  }, [hasJoined, item.id, joinClan, refetchMember]);
 
   return (
     <Layout>
@@ -98,6 +109,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
                 isLoadingMember={isLoadingMember}
                 hasJoined={hasJoined}
                 tabselected={selected}
+                item={item}
                 onJoinOrDeposit={onJoinOrDeposit}
               />
             </VStack>

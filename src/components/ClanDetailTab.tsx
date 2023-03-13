@@ -6,14 +6,23 @@ import DepositActionSheet from './DepositActionSheet';
 import plus_icon from '../assets/plus_icon.png';
 import check_icon from '../assets/check_icon.png';
 import dot_icon from '../assets/dot_icon.png';
+import { ClanData } from '@/configs/programs';
+import { formatSOL } from '@/lib/solana/utils';
 
 type Props = {
   tabselected: number;
   onJoinOrDeposit: () => void;
   isLoadingMember: boolean;
   hasJoined: boolean;
+  item: ClanData;
 };
-const ClanDetailTab = ({ tabselected, onJoinOrDeposit, isLoadingMember, hasJoined }: Props) => {
+const ClanDetailTab = ({
+  tabselected,
+  onJoinOrDeposit,
+  isLoadingMember,
+  hasJoined,
+  item,
+}: Props) => {
   return (
     <VStack>
       {tabselected === 0 ? (
@@ -32,7 +41,7 @@ const ClanDetailTab = ({ tabselected, onJoinOrDeposit, isLoadingMember, hasJoine
                   borderRadius="full"
                 />
                 <Text color="white" fontSize="md">
-                  123 SOL
+                  {formatSOL(item.power)} SOL
                 </Text>
               </HStack>
             </VStack>
@@ -53,7 +62,7 @@ const ClanDetailTab = ({ tabselected, onJoinOrDeposit, isLoadingMember, hasJoine
             disabled={isLoadingMember}
             isLoading={isLoadingMember}
             rounded="full"
-            py="12px"
+            height="56px"
             mb="5"
             bg="#2F80ED"
             onPress={onJoinOrDeposit}>
