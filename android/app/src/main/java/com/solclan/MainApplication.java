@@ -7,7 +7,9 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
+import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
@@ -24,8 +26,8 @@ public class MainApplication extends Application implements ReactApplication {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
-          // packages.add(new MyReactNativePackage());
-          return packages;
+            // packages.add(new MyReactNativePackage());
+            return packages;
         }
 
         @Override
@@ -42,6 +44,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected Boolean isHermesEnabled() {
           return BuildConfig.IS_HERMES_ENABLED;
         }
+
       };
 
   @Override
@@ -49,7 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
     return mReactNativeHost;
   }
 
-  @Override
+    @Override
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);

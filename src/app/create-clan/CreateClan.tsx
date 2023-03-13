@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback, useState } from 'react';
+import React, { PropsWithChildren, useCallback, useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import {
   Box,
@@ -17,6 +17,18 @@ import { BN } from '@project-serum/anchor';
 import useCreateClanMutation from '@/hooks/mutations/useCreateClanMutation';
 import { useMyNavigation } from '@/navigator/Navigation';
 import { Routers } from '@/constants/Routers';
+import ImagePicker from 'react-native-image-crop-picker';
+import axios from 'axios';
+import { File } from 'buffer';
+
+type ImageUpdate = {
+  uri: string;
+  type: string;
+  name: string;
+};
+
+const token =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDIzQzNBOUZENEY2QUM2YTBlRTAzZjU4YkZiMDZFNDU1MWVjNGZmMDEiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Nzg3MDU3NjQ1NjQsIm5hbWUiOiJzb2xjbGFuIn0.Jto6InvwCEpKmK13r3c_FlDZxfbZeIpA34e5e-NYdjM';
 
 const CreateClanScreen: React.FC<PropsWithChildren> = () => {
   const [name, setName] = useState('Feng Shui');
@@ -25,10 +37,61 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
   const { mutateAsync, isLoading } = useCreateClanMutation();
   const navigation = useMyNavigation();
 
+  const [nftImage, setNftImage] = useState<ImageUpdate>({
+    uri: 'https://picsum.photos/200/300',
+    type: 'image/jpeg',
+    name: 'NFT',
+  });
+
+  const uploadMetadata = useCallback(async () => {
+    const formData = new FormData();
+    formData.append('file', nftImage);
+
+    const imageResponse = await axios.post('https://api.web3.storage/upload', formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    const { cid } = imageResponse.data;
+    const imageURL = `https://w3s.link/ipfs/${cid}`;
+
+    const metadata = {
+      name: 'NFT',
+      description: 'NFT',
+      uri: imageURL,
+    };
+
+    console.log('metadata', metadata);
+
+    // Create a blob of the metadata
+    const blob = new Blob([JSON.stringify(metadata)], {
+      type: 'text/plain',
+      lastModified: new Date().getTime(),
+    });
+    console.log('blob', blob);
+    const metadataFormData = new FormData();
+    const arrayBuffer = await blob.arrayBuffer();
+    console.log(arrayBuffer.byteLength);
+
+    // metadataFormData.append('file', file);
+    // const metadataResponse = await axios.post('https://api.web3.storage/upload', metadataFormData, {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //     'Content-Type': 'multipart/form-data',
+    //   },
+    // });
+    // console.log(metadataResponse.data);
+    // const { cid: metadataCid } = metadataResponse.data;
+    // return `https://w3s.link/ipfs/${metadataCid}`;
+  }, [nftImage]);
+
   const handleCreateClan = useCallback(async () => {
     const random0To9 = Math.floor(Math.random() * 10);
     const id = new BN(`10${new Date().getTime()}${random0To9}`);
 
+    uploadMetadata();
+    return;
     try {
       const clan = await mutateAsync({
         id,
@@ -44,7 +107,32 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
       }
       console.log('[CreateClanScreen]', 'handleCreateClan: error', error);
     }
-  }, [mutateAsync, name, description, email, navigation]);
+  }, [uploadMetadata, mutateAsync, name, description, email, navigation]);
+
+  const onPressAvatarUpload = useCallback(async () => {
+    const avatarPath = await ImagePicker.openPicker({
+      // width: 100,
+      // height: 100,
+      cropping: true,
+      multiple: false,
+      mediaType: 'photo',
+      cropperCircleOverlay: true,
+      compressImageQuality: 1,
+    }).catch(err => {
+      console.log('Avatar cancel: ', err);
+    });
+
+    if (!avatarPath) {
+      return;
+    }
+
+    var photo: ImageUpdate = {
+      uri: avatarPath.path,
+      type: 'image/jpeg',
+      name: 'image.jpg',
+    };
+    setNftImage(photo);
+  }, []);
 
   return (
     <Layout>
@@ -56,12 +144,13 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
               <Image
                 style={styles.clanImage}
                 alt="Upload Image"
-                source={{ uri: 'https://picsum.photos/200/300' }}
+                source={{ uri: nftImage.uri }}
                 flex="1"
               />
               <VStack flex="2" space="3">
                 <Box>
                   <Button
+                    onPress={onPressAvatarUpload}
                     width="142px"
                     bgColor="transparent"
                     padding={0}
