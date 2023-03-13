@@ -9,7 +9,7 @@ import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 import { SheetManager } from 'react-native-actions-sheet';
 import { ACTION_SHEET } from '@/constants/ActionSheet';
 import { Routers } from '@/constants/Routers';
-import { useMyRoute } from '@/navigator/Navigation';
+import { useMyNavigation, useMyRoute } from '@/navigator/Navigation';
 import useProgram from '@/lib/solana/hooks/useProgram';
 import { solClanIDL, solClanProgramId } from '@/configs/programs';
 import { findClanAccount, findClanMemberAccount } from '@/configs/pdas';
@@ -34,6 +34,7 @@ const tabData: ButtonType[] = [
 const bottomEdge: Edge[] = ['bottom'];
 
 const ClanDetail: React.FC<PropsWithChildren> = () => {
+  const { navigate } = useMyNavigation();
   const [selected, setSelected] = useState(0);
   const publicKey = usePublicKey();
   const { program } = useProgram(solClanIDL, solClanProgramId);
@@ -76,6 +77,10 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
     }
   }, [hasJoined]);
 
+  const addNewProposal = useCallback(() => {
+    navigate(Routers.CreateProposalScreen);
+  }, [navigate]);
+
   return (
     <Layout>
       <VStack h="100%" backgroundColor="transparent">
@@ -99,6 +104,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
                 hasJoined={hasJoined}
                 tabselected={selected}
                 onJoinOrDeposit={onJoinOrDeposit}
+                addNewProposal={addNewProposal}
               />
             </VStack>
           </SafeAreaView>

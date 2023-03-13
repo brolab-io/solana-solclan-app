@@ -5,4 +5,5 @@ export enum Routers {
   CreateClanScreen = 'CreateClanScreen',
   ProfileScreen = 'ProfileScreen',
   ClanHistoryScreen = 'ClanHistoryScreen',
+  CreateProposalScreen = 'CreateProposalScreen',
 }
