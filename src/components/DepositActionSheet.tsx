@@ -1,10 +1,17 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useCallback } from 'react';
 import { ACTION_SHEET } from '@/constants/ActionSheet';
-import { Button, HStack, Input, Text, VStack } from 'native-base';
+import { Button, HStack, Text, VStack } from 'native-base';
 import ActionSheet from 'react-native-actions-sheet';
 import { StyleSheet } from 'react-native';
+import MyInput from './Input';
 
 const DepositActionSheet: React.FC<PropsWithChildren> = () => {
+  const [value, setValue] = React.useState<string>('');
+
+  const onValueChange = useCallback((text: string | Date) => {
+    setValue(text.toString());
+  }, []);
+
   return (
     <ActionSheet
       id={ACTION_SHEET.DEPOSIT}
@@ -14,29 +21,14 @@ const DepositActionSheet: React.FC<PropsWithChildren> = () => {
       animated
       gestureEnabled={true}>
       <VStack p="5" space="5">
-        <Text color="white" fontSize="xl">
-          Enter deposit amount
-        </Text>
-
-        <HStack
-          w="100%"
-          alignItems="center"
-          space="2"
-          backgroundColor="#2D3748"
-          borderRadius="full">
-          <Input
-            keyboardType="numeric"
-            w="85%"
-            borderWidth={0}
-            color="white"
-            fontSize="md"
-            backgroundColor="transparent"
-            placeholder="Type deposit amount here"
-          />
-          <Text color="white" fontSize="md" ml="auto" mr="5">
-            SOL
-          </Text>
-        </HStack>
+        <MyInput
+          value={value}
+          onChange={onValueChange}
+          title=" Enter deposit amount"
+          placeholder="Type deposit amount here"
+          rightText="SOL"
+          keyboardType="numeric"
+        />
 
         <HStack space="5" alignItems="center">
           <Button

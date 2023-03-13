@@ -66,7 +66,7 @@ export const checkIsMemberOfClan = async (
     },
   ]);
 
-  return memberAccount;
+  return memberAccount || null;
 };
 
 export const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({

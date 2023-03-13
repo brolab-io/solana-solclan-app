@@ -11,17 +11,19 @@ import { formatSOL } from '@/lib/solana/utils';
 
 type Props = {
   tabselected: number;
-  onJoinOrDeposit: () => void;
   isLoadingMember: boolean;
   hasJoined: boolean;
   item: ClanData;
+  addNewProposal: () => void;
+  onJoinOrDeposit: () => void;
 };
 const ClanDetailTab = ({
   tabselected,
-  onJoinOrDeposit,
   isLoadingMember,
   hasJoined,
   item,
+  onJoinOrDeposit,
+  addNewProposal,
 }: Props) => {
   return (
     <VStack>
@@ -143,8 +145,8 @@ const ClanDetailTab = ({
       {tabselected === 3 ? (
         <VStack>
           <HStack borderBottomColor="#2D3748" borderBottomWidth="1" pb="5">
-            <Button w="80%" onPress={() => null} leftIcon={plus_icon}>
-              <Text color="white" fontSize="xl" fontWeight="bold">
+            <Button w="80%" onPress={addNewProposal} leftIcon={plus_icon}>
+              <Text color="white" fontSize="md" fontWeight="bold">
                 Add A New Proposals
               </Text>
             </Button>
