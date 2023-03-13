@@ -16,6 +16,7 @@ import { findClanAccount, findClanMemberAccount } from '@/configs/pdas';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import { useQuery } from '@tanstack/react-query';
 import useJoinClanMutation from '@/hooks/mutations/useJoinClanMutation';
+import { checkIsMemberOfClan } from '@/lib/solana/utils';
 
 const tabData: ButtonType[] = [
   {
@@ -54,28 +55,17 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
   const {
     data: member,
     isLoading: isLoadingMember,
-    error,
     refetch: refetchMember,
-  } = useQuery(['clanMember', memberAccount], async () => {
-    if (!memberAccount) {
-      return null;
-    }
-    return await program.account.member.fetch(memberAccount);
-  });
-
-  const hasJoined = useMemo(() => {
-    // Account exists but has no data
-    if (!member) {
-      return false;
-    }
-    // Acount does not exist
-    if (error instanceof Error && error.message.includes('Account does not exist or has no data')) {
-      return false;
-    }
-    // Account exists and has data
-    return true;
-  }, [error, member]);
-
+  } = useQuery(
+    ['clanMember', memberAccount],
+    () => {
+      return checkIsMemberOfClan(program, memberAccount!, publicKey!);
+    },
+    {
+      enabled: !!memberAccount && !!publicKey,
+    },
+  );
+  const hasJoined = !!member;
   const onJoinOrDeposit = useCallback(async () => {
     if (hasJoined) {
       SheetManager.show(ACTION_SHEET.DEPOSIT);

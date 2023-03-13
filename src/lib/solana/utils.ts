@@ -1,5 +1,7 @@
+import { SolanaSolclan } from '@/configs/programs/solclan';
+import { Program } from '@project-serum/anchor';
 import { ComputeBudgetProgram, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
-import { decode } from 'bs58';
+import { decode, encode } from 'bs58';
 import { Linking as RNLinking } from 'react-native';
 import nacl from 'tweetnacl';
 
@@ -42,6 +44,29 @@ export const formatPublicKey = (publicKey: string | PublicKey) => {
 
 export const formatSOL = (lamports: number) => {
   return (lamports / LAMPORTS_PER_SOL).toFixed(2);
+};
+
+export const checkIsMemberOfClan = async (
+  program: Program<SolanaSolclan>,
+  clanAccount: PublicKey,
+  walletAccount: PublicKey,
+) => {
+  const [memberAccount] = await program.account.member.all([
+    {
+      memcmp: {
+        offset: 8,
+        bytes: encode(clanAccount.toBuffer()),
+      },
+    },
+    {
+      memcmp: {
+        offset: 8 + 32,
+        bytes: encode(walletAccount.toBuffer()),
+      },
+    },
+  ]);
+
+  return memberAccount;
 };
 
 export const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
