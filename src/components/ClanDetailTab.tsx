@@ -232,7 +232,7 @@ const ClanDetailTab = ({
           </VStack>
         </VStack>
       ) : null}
-      <DepositActionSheet />
+      <DepositActionSheet id={item.id} />
     </VStack>
   );
 };

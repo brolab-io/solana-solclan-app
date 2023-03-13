@@ -12,7 +12,7 @@ import { Routers } from '@/constants/Routers';
 import { useMyNavigation, useMyRoute } from '@/navigator/Navigation';
 import useProgram from '@/lib/solana/hooks/useProgram';
 import { solClanIDL, solClanProgramId } from '@/configs/programs';
-import { findClanAccount, findClanMemberAccount } from '@/configs/pdas';
+import { findClanAccount } from '@/configs/pdas';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import { useQuery } from '@tanstack/react-query';
 import useJoinClanMutation from '@/hooks/mutations/useJoinClanMutation';
@@ -41,29 +41,40 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
   const publicKey = usePublicKey();
   const { program } = useProgram(solClanIDL, solClanProgramId);
   const {
-    params: { item },
+    params: { item: clanFromRoute },
   } = useMyRoute<Routers.ClanDetailScreen>();
+
+  const { data: clan } = useQuery(
+    ['clan', clanFromRoute.id.toString()],
+    async () => {
+      const clanAccount = findClanAccount(clanFromRoute.id);
+      return program.account.clan.fetch(clanAccount);
+    },
+    {
+      initialData: clanFromRoute,
+    },
+  );
+
   const { mutateAsync: joinClan } = useJoinClanMutation();
 
-  const memberAccount = useMemo(() => {
+  const clanAccount = useMemo(() => {
     if (!publicKey) {
       return null;
     }
-    const clanAccount = findClanAccount(item.id);
-    return findClanMemberAccount(clanAccount, publicKey);
-  }, [item.id, publicKey]);
+    return findClanAccount(clan.id);
+  }, [clan.id, publicKey]);
 
   const {
     data: member,
     isLoading: isLoadingMember,
     refetch: refetchMember,
   } = useQuery(
-    ['clanMember', memberAccount],
+    ['clanMember', clanAccount],
     () => {
-      return checkIsMemberOfClan(program, memberAccount!, publicKey!);
+      return checkIsMemberOfClan(program, clanAccount!, publicKey!);
     },
     {
-      enabled: !!memberAccount && !!publicKey,
+      enabled: !!clanAccount && !!publicKey,
     },
   );
   const hasJoined = !!member;
@@ -72,11 +83,11 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
       SheetManager.show(ACTION_SHEET.DEPOSIT);
     } else {
       await joinClan({
-        id: item.id,
+        id: clan.id,
       });
       await refetchMember();
     }
-  }, [hasJoined, item.id, joinClan, refetchMember]);
+  }, [hasJoined, clan.id, joinClan, refetchMember]);
 
   const addNewProposal = useCallback(() => {
     navigate(Routers.CreateProposalScreen);
@@ -89,7 +100,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
         <ScrollView mt="5">
           <SafeAreaView edges={bottomEdge}>
             <VStack px="5">
-              <ClanDetailItem item={item} />
+              <ClanDetailItem item={clan} />
               <ButtonTab
                 borderRadius="full"
                 borderColor="#4C5172"
@@ -98,13 +109,13 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
                 justifyContent="space-between"
                 data={tabData}
                 selected={selected}
-                tabSelected={setSelected}
+                onChangeTab={setSelected}
               />
               <ClanDetailTab
                 isLoadingMember={isLoadingMember}
                 hasJoined={hasJoined}
                 tabselected={selected}
-                item={item}
+                item={clan}
                 onJoinOrDeposit={onJoinOrDeposit}
                 addNewProposal={addNewProposal}
               />

@@ -9,13 +9,13 @@ export type ButtonType = {
 type Props = {
   data: ButtonType[];
   selected: number;
-  tabSelected: (index: number) => void;
+  onChangeTab: (index: number) => void;
 } & ComponentProps<typeof HStack>;
 
 const ButtonTab: React.FC<PropsWithChildren<Props>> = ({
   data,
   selected,
-  tabSelected,
+  onChangeTab,
   ...props
 }: Props) => {
   return (
@@ -25,7 +25,7 @@ const ButtonTab: React.FC<PropsWithChildren<Props>> = ({
           w="auto"
           px="4"
           key={item.label}
-          onPress={() => tabSelected(index)}
+          onPress={() => onChangeTab(index)}
           backgroundColor={selected === index ? 'blue.600' : 'transparent'}>
           <Text color="white" fontSize="sm">
             {item.label}

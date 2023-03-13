@@ -40,7 +40,7 @@ const MyClanItems: React.FC<PropsWithChildren<Props>> = ({
         justifyContent="space-between"
         data={tabData}
         selected={tabSelected}
-        tabSelected={onTabSelected}
+        onChangeTab={onTabSelected}
       />
       <Box w="100%" h="1" px="5">
         <Box borderTopColor="#4C5172" borderTopWidth="1" w="100%" />
