@@ -7,6 +7,7 @@ import { solClanProgramId, solClanIDL, ProposalData } from '@/configs/programs';
 import useProgram from '@/lib/solana/hooks/useProgram';
 import { encode } from 'bs58';
 import { ProgramAccount } from '@project-serum/anchor';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 type Props = {
   data: any;
@@ -33,7 +34,7 @@ const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data, proposals }) => {
   });
 
   const totalDeposit = useMemo(() => {
-    return itMe?.reduce((acc, item) => acc + item.account.power, 0);
+    return itMe?.reduce((acc, item) => acc + item.account.power / LAMPORTS_PER_SOL, 0);
   }, [itMe]);
 
   return (
