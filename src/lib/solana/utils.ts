@@ -1,5 +1,5 @@
 import { SolanaSolclan } from '@/configs/programs/solclan';
-import { Program } from '@project-serum/anchor';
+import { Program, parseIdlErrors, Idl } from '@project-serum/anchor';
 import { ComputeBudgetProgram, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
 import { decode, encode } from 'bs58';
 import { Linking as RNLinking } from 'react-native';
@@ -44,6 +44,20 @@ export const formatPublicKey = (publicKey: string | PublicKey, padSize = 6) => {
 
 export const formatSOL = (lamports: number) => {
   return (lamports / LAMPORTS_PER_SOL).toFixed(2);
+};
+
+export const getMutationMessage = (error: unknown, idl: Idl) => {
+  if (error instanceof Error) {
+    const message = error.message;
+    // "failed to send transaction: Transaction simulation failed: Error processing Instruction 2: custom program error: 0x1780"
+    const match = message.match(/custom program error: 0x([0-9a-f]+)/);
+    if (match) {
+      const code = parseInt(match[1], 16);
+      const idlError = parseIdlErrors(idl);
+      return idlError.get(code);
+    }
+  }
+  return 'An error occurred';
 };
 
 export const checkIsMemberOfClan = async (

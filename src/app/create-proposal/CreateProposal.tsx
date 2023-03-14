@@ -7,9 +7,14 @@ import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 import calen_icon from '@/assets/calen_icon.png';
 import useCreateProposalMutation from '@/hooks/mutations/useCreateProposalMutation';
 import { BN } from '@project-serum/anchor';
-import { useMyRoute } from '@/navigator/Navigation';
+import { useMyNavigation, useMyRoute } from '@/navigator/Navigation';
 import { Routers } from '@/constants/Routers';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { getMutationMessage } from '@/lib/solana/utils';
+import { solClanIDL } from '@/configs/programs';
+import { Alert } from 'react-native';
+import { showDialog } from '@/components/Dialog';
+import { queryClient } from '@/configs/query.client';
 
 const edges: Edge[] = ['bottom'];
 
@@ -17,6 +22,8 @@ const CreateProposal: React.FC = () => {
   const {
     params: { item },
   } = useMyRoute<Routers.CreateProposalScreen>();
+  const { goBack } = useMyNavigation();
+
   const { mutateAsync, isLoading: isCreatingProposal } = useCreateProposalMutation();
 
   const [title, setTitle] = React.useState<string>('');
@@ -36,12 +43,18 @@ const CreateProposal: React.FC = () => {
         description,
         startAt: new BN(Math.floor(startTime.getTime() / 1000)),
         endAt: new BN(Math.floor(endTime.getTime() / 1000)),
-        amount: new BN(amount).mul(new BN(LAMPORTS_PER_SOL)),
+        amount: new BN(parseFloat(amount.replace(',', '.')) * LAMPORTS_PER_SOL),
+      });
+      queryClient.invalidateQueries(['proposals', item.id.toString(), 'all']);
+      goBack();
+      showDialog({
+        title: 'Create proposal successfully',
+        content: 'Your proposal has been created successfully',
       });
     } catch (error) {
-      console.log('error', JSON.stringify(error));
+      Alert.alert('Failed to create proposal', getMutationMessage(error, solClanIDL));
     }
-  }, [amount, description, endTime, item.id, mutateAsync, startTime, title]);
+  }, [amount, description, endTime, goBack, item.id, mutateAsync, startTime, title]);
 
   return (
     <Layout>
@@ -101,6 +114,7 @@ const CreateProposal: React.FC = () => {
                 value={amount}
                 onChange={setAmount}
                 title="Total votes"
+                keyboardType="decimal-pad"
                 placeholder="Total of votes"
               />
 
@@ -108,6 +122,7 @@ const CreateProposal: React.FC = () => {
                 h="54px"
                 isLoading={isCreatingProposal}
                 onPress={handleCreateProposal}
+                isLoadingText="Creating proposal"
                 rounded="full"
                 backgroundColor="#215BF0">
                 <Text color="white" fontSize="md" fontWeight="bold">

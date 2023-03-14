@@ -19,9 +19,10 @@ import MainTabScreen from './TabNavigation';
 import ClanDetailScreen from '@/app/home/ClanDetail';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import CreateClanScreen from '@/app/create-clan/CreateClan';
-import { ClanData } from '@/configs/programs';
+import { ClanData, ProposalData } from '@/configs/programs';
 import ClanHistoryScreen from '@/app/clan-history/History';
 import CreateProposalScreen from '@/app/create-proposal/CreateProposal';
+import { PublicKey } from '@solana/web3.js';
 
 const AppStack = createStackNavigator<MyParamList>();
 
@@ -31,7 +32,10 @@ type MyParamList = {
   [Routers.CreateClanScreen]: undefined;
   [Routers.ClanDetailScreen]: { item: ClanData };
   [Routers.ProfileScreen]: undefined;
-  [Routers.ClanHistoryScreen]: undefined;
+  [Routers.ClanHistoryScreen]: {
+    publicKey: PublicKey;
+    account: ProposalData;
+  };
   [Routers.CreateProposalScreen]: { item: ClanData };
 };
 
