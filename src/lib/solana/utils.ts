@@ -37,9 +37,9 @@ export const encryptPayload = (payload: any, sharedSecret: Uint8Array) => {
   return [nonce, encryptedPayload];
 };
 
-export const formatPublicKey = (publicKey: string | PublicKey) => {
+export const formatPublicKey = (publicKey: string | PublicKey, padSize = 6) => {
   let _publicKey = typeof publicKey === 'string' ? publicKey : publicKey.toBase58();
-  return `0x${_publicKey.slice(0, 4)}...${_publicKey.slice(-4)}`;
+  return `${_publicKey.slice(0, padSize)}...${_publicKey.slice(-padSize)}`;
 };
 
 export const formatSOL = (lamports: number) => {

@@ -1,3 +1,4 @@
+import { findClanAccount } from '@/configs/pdas';
 import { ClanData } from '@/configs/programs';
 import { formatPublicKey } from '@/lib/solana/utils';
 import { Box, HStack, Image, Text, VStack } from 'native-base';
@@ -17,8 +18,11 @@ const ClanDetailItem: React.FC<Props> = ({ item }: Props) => {
         h={200}
         resizeMode="cover"
       />
-      <Text color="white" fontSize="xl">
+      <Text color="white" fontSize="3xl">
         {item.name}
+      </Text>
+      <Text color="#aaa" fontSize="xs" mt="-3">
+        {formatPublicKey(findClanAccount(item.id))} (#{item.id.toString()})
       </Text>
 
       <HStack justifyContent="flex-start">
@@ -35,7 +39,7 @@ const ClanDetailItem: React.FC<Props> = ({ item }: Props) => {
               Founder
             </Text>
             <Text color="white" fontSize="md">
-              {formatPublicKey(item.creator)}
+              {formatPublicKey(item.creator, 8)}
             </Text>
           </VStack>
         </HStack>

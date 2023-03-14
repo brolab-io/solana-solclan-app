@@ -9,6 +9,7 @@ import useCreateProposalMutation from '@/hooks/mutations/useCreateProposalMutati
 import { BN } from '@project-serum/anchor';
 import { useMyRoute } from '@/navigator/Navigation';
 import { Routers } from '@/constants/Routers';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const edges: Edge[] = ['bottom'];
 
@@ -20,43 +21,27 @@ const CreateProposal: React.FC = () => {
 
   const [title, setTitle] = React.useState<string>('');
   const [description, setDescription] = React.useState<string>('');
-  const [link, setLink] = React.useState<string>('');
+  const [amount, setAmount] = React.useState<string>('');
   const [startTime, setStartTime] = React.useState<Date>(new Date());
   const [endTime, setEndTime] = React.useState<Date>(new Date());
-
-  const onNameChange = useCallback((value: string | Date) => {
-    setTitle(value.toString());
-  }, []);
-
-  const onDescriptionChange = useCallback((value: string | Date) => {
-    setDescription(value.toString());
-  }, []);
-
-  const onLinkChange = useCallback((value: string | Date) => {
-    setLink(value.toString());
-  }, []);
-
-  const onStartTimeChange = useCallback((value: string | Date) => {
-    setStartTime(new Date(value));
-  }, []);
-
-  const onEndTimeChange = useCallback((value: string | Date) => {
-    setEndTime(new Date(value));
-  }, []);
 
   const handleCreateProposal = useCallback(async () => {
     const random0To9 = Math.floor(Math.random() * 10);
     const proposalId = new BN(`10${new Date().getTime()}${random0To9}`);
-    await mutateAsync({
-      clanId: item.id,
-      proposalId,
-      title,
-      description,
-      startAt: new BN(Math.floor(startTime.getTime() / 1000)),
-      endAt: new BN(Math.floor(endTime.getTime() / 1000)),
-      amount: new BN(100),
-    });
-  }, [description, endTime, item.id, mutateAsync, startTime, title]);
+    try {
+      await mutateAsync({
+        clanId: item.id,
+        proposalId,
+        title,
+        description,
+        startAt: new BN(Math.floor(startTime.getTime() / 1000)),
+        endAt: new BN(Math.floor(endTime.getTime() / 1000)),
+        amount: new BN(amount).mul(new BN(LAMPORTS_PER_SOL)),
+      });
+    } catch (error) {
+      console.log('error', JSON.stringify(error));
+    }
+  }, [amount, description, endTime, item.id, mutateAsync, startTime, title]);
 
   return (
     <Layout>
@@ -77,13 +62,13 @@ const CreateProposal: React.FC = () => {
               /> */}
               <MyInput
                 value={title}
-                onChange={onNameChange}
+                onChange={setTitle}
                 title="Proposal title"
                 placeholder="Name of proposal"
               />
               <MyInput
                 value={description}
-                onChange={onDescriptionChange}
+                onChange={setDescription}
                 isMultiLine
                 title="Proposal Description"
                 placeholder="Write proposal description here"
@@ -93,7 +78,7 @@ const CreateProposal: React.FC = () => {
                 <Box flex={1}>
                   <MyInput
                     value={startTime}
-                    onChange={onStartTimeChange}
+                    onChange={setStartTime}
                     type="date"
                     title="Start time"
                     placeholder="Start"
@@ -103,7 +88,7 @@ const CreateProposal: React.FC = () => {
                 <Box flex={1}>
                   <MyInput
                     value={endTime}
-                    onChange={onEndTimeChange}
+                    onChange={setEndTime}
                     type="date"
                     title="End Time"
                     placeholder="End"
@@ -113,10 +98,10 @@ const CreateProposal: React.FC = () => {
               </HStack>
 
               <MyInput
-                value={link}
-                onChange={onLinkChange}
-                title="Link"
-                placeholder="Name of proposal"
+                value={amount}
+                onChange={setAmount}
+                title="Total votes"
+                placeholder="Total of votes"
               />
 
               <Button

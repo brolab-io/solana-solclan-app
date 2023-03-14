@@ -272,6 +272,11 @@ export type SolanaSolclan = {
           isSigner: false;
         },
         {
+          name: 'vault';
+          isMut: true;
+          isSigner: false;
+        },
+        {
           name: 'clan';
           isMut: true;
           isSigner: false;
@@ -321,10 +326,6 @@ export type SolanaSolclan = {
         {
           name: 'amount';
           type: 'u64';
-        },
-        {
-          name: 'vault';
-          type: 'publicKey';
         },
       ];
     },
@@ -415,6 +416,83 @@ export type SolanaSolclan = {
           type: 'bool';
         },
       ];
+    },
+    {
+      name: 'executeProposal';
+      accounts: [
+        {
+          name: 'proposal';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'member';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'clan';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'treasurer';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'vault';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'authority';
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: 'systemProgram';
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: 'rent';
+          isMut: false;
+          isSigner: false;
+        },
+      ];
+      args: [];
+    },
+    {
+      name: 'claimVault';
+      accounts: [
+        {
+          name: 'vault';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'proposal';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'authority';
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: 'systemProgram';
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: 'rent';
+          isMut: false;
+          isSigner: false;
+        },
+      ];
+      args: [];
     },
   ];
   accounts: [
@@ -564,6 +642,16 @@ export type SolanaSolclan = {
             type: 'publicKey';
           },
           {
+            name: 'executed';
+            type: 'bool';
+          },
+          {
+            name: 'executedBy';
+            type: {
+              option: 'publicKey';
+            };
+          },
+          {
             name: 'votes';
             type: 'u64';
           },
@@ -594,6 +682,12 @@ export type SolanaSolclan = {
           {
             name: 'createdAt';
             type: 'i64';
+          },
+          {
+            name: 'executedAt';
+            type: {
+              option: 'i64';
+            };
           },
         ];
       };
@@ -866,6 +960,31 @@ export type SolanaSolclan = {
       code: 6021;
       name: 'ProposalAlreadyEnded';
       msg: 'Proposal already ended. Cannot vote';
+    },
+    {
+      code: 6022;
+      name: 'ProposalNotPassed';
+      msg: 'Proposal not passed. Cannot execute';
+    },
+    {
+      code: 6023;
+      name: 'ProposalAlreadyExecuted';
+      msg: 'Proposal already executed';
+    },
+    {
+      code: 6024;
+      name: 'NotEnoughPower';
+      msg: 'Not enough power to execute proposal';
+    },
+    {
+      code: 6025;
+      name: 'ProposalNotEnded';
+      msg: 'Proposal not ended';
+    },
+    {
+      code: 6026;
+      name: 'UserClaimed';
+      msg: 'User already claimed';
     },
   ];
 };
@@ -1144,6 +1263,11 @@ export const IDL: SolanaSolclan = {
           isSigner: false,
         },
         {
+          name: 'vault',
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: 'clan',
           isMut: true,
           isSigner: false,
@@ -1193,10 +1317,6 @@ export const IDL: SolanaSolclan = {
         {
           name: 'amount',
           type: 'u64',
-        },
-        {
-          name: 'vault',
-          type: 'publicKey',
         },
       ],
     },
@@ -1287,6 +1407,83 @@ export const IDL: SolanaSolclan = {
           type: 'bool',
         },
       ],
+    },
+    {
+      name: 'executeProposal',
+      accounts: [
+        {
+          name: 'proposal',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'member',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'clan',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'treasurer',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'vault',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'authority',
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'rent',
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: 'claimVault',
+      accounts: [
+        {
+          name: 'vault',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'proposal',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'authority',
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'rent',
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [],
     },
   ],
   accounts: [
@@ -1436,6 +1633,16 @@ export const IDL: SolanaSolclan = {
             type: 'publicKey',
           },
           {
+            name: 'executed',
+            type: 'bool',
+          },
+          {
+            name: 'executedBy',
+            type: {
+              option: 'publicKey',
+            },
+          },
+          {
             name: 'votes',
             type: 'u64',
           },
@@ -1466,6 +1673,12 @@ export const IDL: SolanaSolclan = {
           {
             name: 'createdAt',
             type: 'i64',
+          },
+          {
+            name: 'executedAt',
+            type: {
+              option: 'i64',
+            },
           },
         ],
       },
@@ -1738,6 +1951,31 @@ export const IDL: SolanaSolclan = {
       code: 6021,
       name: 'ProposalAlreadyEnded',
       msg: 'Proposal already ended. Cannot vote',
+    },
+    {
+      code: 6022,
+      name: 'ProposalNotPassed',
+      msg: 'Proposal not passed. Cannot execute',
+    },
+    {
+      code: 6023,
+      name: 'ProposalAlreadyExecuted',
+      msg: 'Proposal already executed',
+    },
+    {
+      code: 6024,
+      name: 'NotEnoughPower',
+      msg: 'Not enough power to execute proposal',
+    },
+    {
+      code: 6025,
+      name: 'ProposalNotEnded',
+      msg: 'Proposal not ended',
+    },
+    {
+      code: 6026,
+      name: 'UserClaimed',
+      msg: 'User already claimed',
     },
   ],
 };

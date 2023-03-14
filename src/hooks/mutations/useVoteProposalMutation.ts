@@ -1,16 +1,10 @@
-import {
-  findClanAccount,
-  findClanMemberAccount,
-  findProposalAccount,
-  findVaultAccount,
-} from '@/configs/pdas';
+import { findBallotAccount, findClanMemberAccount } from '@/configs/pdas';
 import { solClanProgramId, solClanIDL } from '@/configs/programs';
 import useConnection from '@/lib/solana/hooks/useConnection';
 import useProgram from '@/lib/solana/hooks/useProgram';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import useSignAndSendTransaction from '@/lib/solana/hooks/useSignAndSendTransaction';
-import { BN } from '@project-serum/anchor';
-import { SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
+import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
 import { useMutation } from '@tanstack/react-query';
 import {
   addPriorityFee,
@@ -19,16 +13,11 @@ import {
 } from '@/lib/solana/utils';
 
 type Payload = {
-  proposalId: BN;
-  clanId: BN;
-  title: string;
-  description: string;
-  startAt: BN;
-  endAt: BN;
-  amount: BN;
+  proposalPubkey: PublicKey;
+  vote: boolean;
 };
 
-const useCreateProposalMutation = () => {
+const useVoteProposalMutation = () => {
   const publicKey = usePublicKey();
   const { program } = useProgram(solClanIDL, solClanProgramId);
   const connection = useConnection();
@@ -38,45 +27,18 @@ const useCreateProposalMutation = () => {
     if (!publicKey) {
       return Promise.reject('Please connect your wallet');
     }
-
-    const clanAccount = findClanAccount(payload.clanId);
+    const proposal = await program.account.proposal.fetch(payload.proposalPubkey);
+    const clanAccount = proposal.clan;
     const memberAccount = findClanMemberAccount(clanAccount, publicKey);
-    const proposalAccount = findProposalAccount(payload.proposalId, clanAccount, publicKey);
-
-    console.log(`clanAccount: ${clanAccount.toBase58()}`);
-    console.log(`memberAccount: ${memberAccount.toBase58()}`);
-    console.log(`proposalAccount: ${proposalAccount.toBase58()}`);
-
-    // const proposalAccountData = await program.account.proposal.fetch(proposalAccount);
-    const vaultAccount = findVaultAccount(proposalAccount, publicKey);
-
-    // console.log(`proposalAccountData: ${JSON.stringify(proposalAccountData)}`);
-    console.log(`vaultAccount: ${vaultAccount.toBase58()}`);
-
-    console.log(
-      'payload',
-      payload.proposalId,
-      payload.title,
-      payload.description,
-      payload.startAt,
-      payload.endAt,
-      payload.amount,
-    );
+    const ballotAccount = findBallotAccount(publicKey, memberAccount, payload.proposalPubkey);
 
     const tx = await program.methods
-      .createProposal(
-        payload.proposalId,
-        payload.title,
-        payload.description,
-        payload.startAt,
-        payload.endAt,
-        payload.amount,
-      )
+      .vote(payload.vote)
       .accounts({
         member: memberAccount,
+        proposal: payload.proposalPubkey,
+        ballot: ballotAccount,
         clan: clanAccount,
-        vault: vaultAccount,
-        proposal: proposalAccount,
         authority: publicKey,
         systemProgram: SystemProgram.programId,
         rent: SYSVAR_RENT_PUBKEY,
@@ -92,4 +54,4 @@ const useCreateProposalMutation = () => {
   });
 };
 
-export default useCreateProposalMutation;
+export default useVoteProposalMutation;

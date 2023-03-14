@@ -1,3 +1,4 @@
+import { findClanAccount } from '@/configs/pdas';
 import { ClanData } from '@/configs/programs';
 import { formatPublicKey, formatSOL } from '@/lib/solana/utils';
 import { Box, HStack, Image, Pressable, Text, VStack } from 'native-base';
@@ -24,8 +25,11 @@ const CardItem: React.FC<CardItemProps> = ({ onPress, item }: CardItemProps) => 
           resizeMode="cover"
         />
         <Box m="3" borderBottomColor="#7C87B1" borderBottomWidth="1" pb="2">
-          <Text color="white" fontSize="xl">
+          <Text color="white" fontSize="2xl">
             {item.name || 'No Name'}
+          </Text>
+          <Text color="#aaa" fontSize="xs">
+            {formatPublicKey(findClanAccount(item.id))} (#{item.id.toString()})
           </Text>
         </Box>
         <HStack justifyContent="space-around">
