@@ -48,7 +48,7 @@ const Vote: React.FC<Props> = ({
 
   const percent = useMemo(() => {
     if (proposalData.votes.eq(new BN(0))) {
-      return 0;
+      return new BN(0);
     }
     if (isVoteFor) {
       return proposalData.yesVotes.mul(new BN(100)).div(proposalData.votes);
