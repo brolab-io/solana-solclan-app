@@ -1,27 +1,33 @@
 import { ProposalData, solClanIDL, solClanProgramId } from '@/configs/programs';
 import useProgram from '@/lib/solana/hooks/useProgram';
-import { formatPublicKey } from '@/lib/solana/utils';
+import { formatPublicKey, getMutationMessage } from '@/lib/solana/utils';
 import { PublicKey } from '@solana/web3.js';
 import { useQuery } from '@tanstack/react-query';
 import { encode } from 'bs58';
-import { Box, HStack, Image, Text, VStack } from 'native-base';
-import React, { PropsWithChildren } from 'react';
+import {
+  Box,
+  HStack,
+  Image,
+  Text,
+  VStack,
+  Button as NativeBaseButton,
+  useToast,
+} from 'native-base';
+import React, { PropsWithChildren, useCallback, useState } from 'react';
 import Button from './Button';
+import moment from 'moment';
+import useVoteProposalMutation from '@/hooks/mutations/useVoteProposalMutation';
+import { Alert } from 'react-native';
+import { queryClient } from '@/configs/query.client';
 
 type Props = {
   proposalAccount: PublicKey;
   proposal: ProposalData;
-  onVoteForPress?: () => void;
-  onVoteAgainstPress?: () => void;
 };
 
-const SentFund: React.FC<PropsWithChildren<Props>> = ({
-  onVoteForPress,
-  onVoteAgainstPress,
-  proposalAccount,
-  proposal,
-}) => {
+const SentFund: React.FC<PropsWithChildren<Props>> = ({ proposalAccount, proposal }) => {
   const { program } = useProgram(solClanIDL, solClanProgramId);
+  const [votingType, setVotingType] = useState<boolean | undefined>(undefined);
   const { data: voteCount } = useQuery(
     ['proposals', 'vote-count', proposalAccount.toBase58()],
     async () => {
@@ -33,13 +39,50 @@ const SentFund: React.FC<PropsWithChildren<Props>> = ({
           },
         },
       ];
+
       return program.account.ballot.all(filters).then(ballots => ballots.length);
     },
   );
+  const toast = useToast();
+  const { mutateAsync: vote, isLoading: isVoting } = useVoteProposalMutation();
+
+  const handleVote = useCallback(
+    async (_vote: boolean) => {
+      setVotingType(_vote);
+      try {
+        await vote({
+          proposalPubkey: proposalAccount,
+          vote: _vote,
+        });
+        toast.show({
+          title: 'Vote proposal',
+          description: 'Vote proposal successfully',
+        });
+        queryClient.invalidateQueries(['proposals', 'item', proposalAccount.toBase58()]);
+        // queryClient.invalidateQueries(['proposals', 'vote-count', proposalAccount.toBase58()]);
+        queryClient.invalidateQueries(['proposals', 'votes', proposalAccount.toBase58(), 0]);
+        queryClient.invalidateQueries(['proposals', 'votes', proposalAccount.toBase58(), 1]);
+      } catch (error) {
+        Alert.alert('Failed to vote proposal', getMutationMessage(error, solClanIDL));
+      } finally {
+        setVotingType(undefined);
+      }
+    },
+    [proposalAccount, toast, vote],
+  );
+
+  const handleVoteFor = useCallback(() => {
+    handleVote(true);
+  }, [handleVote]);
+
+  const handleVoteAgainst = useCallback(() => {
+    handleVote(false);
+  }, [handleVote]);
+
   return (
     <VStack pt="2" space="3">
-      <Text color="white" fontSize="md">
-        Return Accidentally Sent Funds
+      <Text color="white" fontSize="2xl">
+        {proposal.title}
       </Text>
       <HStack w="100%" justifyContent="space-between" alignItems="center">
         <Button
@@ -63,7 +106,7 @@ const SentFund: React.FC<PropsWithChildren<Props>> = ({
         </Box>
 
         <Text color="white" fontSize="md" fontWeight="bold">
-          12:30 A.M 9/9/2021
+          {moment(proposal.endAt.toNumber() * 1000).format('HH:mm A DD/MM/YYYY')}
         </Text>
       </HStack>
 
@@ -89,26 +132,37 @@ const SentFund: React.FC<PropsWithChildren<Props>> = ({
             {formatPublicKey(proposal.author, 8)}
           </Text>
           <Text color="white" fontSize="md">
-            Created 12:30 A.M 9/9/2021
+            {moment(proposal.createdAt.toNumber() * 1000).format('HH:mm A DD/MM/YYYY')}
           </Text>
         </VStack>
       </HStack>
       <HStack w="100%" space="3">
-        <Button flex={1} py="5" backgroundColor="#215BF0" rounded="2xl" onPress={onVoteForPress}>
+        <NativeBaseButton
+          flex={1}
+          backgroundColor="#215BF0"
+          rounded="2xl"
+          height="54px"
+          isDisabled={isVoting}
+          isLoadingText="Voting..."
+          isLoading={isVoting && votingType === true}
+          onPress={handleVoteFor}>
           <Text color="white" fontSize="md" fontWeight="bold">
             Vote For
           </Text>
-        </Button>
-        <Button
+        </NativeBaseButton>
+        <NativeBaseButton
           flex={1}
-          py="5"
           backgroundColor="#F56565"
+          height="54px"
           rounded="2xl"
-          onPress={onVoteAgainstPress}>
+          isDisabled={isVoting}
+          isLoadingText="Voting..."
+          isLoading={isVoting && votingType === false}
+          onPress={handleVoteAgainst}>
           <Text color="white" fontSize="md" fontWeight="bold">
             Vote Against
           </Text>
-        </Button>
+        </NativeBaseButton>
       </HStack>
     </VStack>
   );

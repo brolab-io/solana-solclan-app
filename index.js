@@ -10,6 +10,7 @@ import { LogBox } from 'react-native';
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
   'Account does not exist',
+  'Error: failed to send transaction:',
 ]);
 
 AppRegistry.registerComponent(appName, () => App);

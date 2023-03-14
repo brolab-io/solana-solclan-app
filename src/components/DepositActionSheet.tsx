@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useCallback, useState } from 'react';
 import { ACTION_SHEET } from '@/constants/ActionSheet';
-import { Button, HStack, Text, VStack } from 'native-base';
+import { Button, HStack, Text, useToast, VStack } from 'native-base';
 import ActionSheet, { SheetManager } from 'react-native-actions-sheet';
 import { StyleSheet } from 'react-native';
 import MyInput from './Input';
@@ -22,7 +22,7 @@ const DepositActionSheet: React.FC<PropsWithChildren<Props>> = ({ id }) => {
   const onValueChange = useCallback((text: string | Date) => {
     setValue(text.toString());
   }, []);
-
+  const toast = useToast();
   const handleDeposit = useCallback(async () => {
     const amount = new BN(parseFloat(value)).mul(new BN(LAMPORTS_PER_SOL));
     console.log(`Deposit ${value} (${amount}) to clan ${id}`);
@@ -33,10 +33,14 @@ const DepositActionSheet: React.FC<PropsWithChildren<Props>> = ({ id }) => {
       });
       queryClient.invalidateQueries(['clan', id.toString()]);
       SheetManager.hide(ACTION_SHEET.DEPOSIT);
+      toast.show({
+        title: 'Success',
+        description: 'Deposit successfully',
+      });
     } catch (error) {
       console.log(error);
     }
-  }, [deposit, id, value]);
+  }, [deposit, id, toast, value]);
 
   return (
     <ActionSheet

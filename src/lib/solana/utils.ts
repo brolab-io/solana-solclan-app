@@ -4,6 +4,8 @@ import { ComputeBudgetProgram, LAMPORTS_PER_SOL, PublicKey, Transaction } from '
 import { decode, encode } from 'bs58';
 import { Linking as RNLinking } from 'react-native';
 import nacl from 'tweetnacl';
+import { BN } from '@project-serum/anchor';
+import moment from 'moment';
 
 export const buildUrl = (path: string, params: URLSearchParams) => {
   return `https://phantom.app/ul/v1/${path}?${params.toString()}`;
@@ -46,6 +48,13 @@ export const formatSOL = (lamports: number) => {
   return (lamports / LAMPORTS_PER_SOL).toFixed(2);
 };
 
+export const formatTime = (unixTime: BN | Date) => {
+  if ('getTime' in unixTime) {
+    return moment(unixTime).format('HH:mm:ss A DD/MM/YYYY');
+  }
+  return moment(unixTime.toNumber() * 1000).format('HH:mm A DD/MM/YYYY');
+};
+
 export const getMutationMessage = (error: unknown, idl: Idl) => {
   if (error instanceof Error) {
     const message = error.message;
@@ -54,8 +63,9 @@ export const getMutationMessage = (error: unknown, idl: Idl) => {
     if (match) {
       const code = parseInt(match[1], 16);
       const idlError = parseIdlErrors(idl);
-      return idlError.get(code);
+      return idlError.get(code) || message;
     }
+    return message;
   }
   return 'An error occurred';
 };

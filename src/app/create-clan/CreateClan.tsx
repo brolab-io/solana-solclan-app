@@ -18,15 +18,15 @@ import useCreateClanMutation from '@/hooks/mutations/useCreateClanMutation';
 import { useMyNavigation } from '@/navigator/Navigation';
 import { Routers } from '@/constants/Routers';
 import ImagePicker from 'react-native-image-crop-picker';
-import { uploadImage, uploadMetadata } from '@/services/Web3Storage.service';
+import { useToast } from 'native-base';
 
 const CreateClanScreen: React.FC<PropsWithChildren> = () => {
-  const [name, setName] = useState('Feng Shui');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
   const { mutateAsync, isLoading } = useCreateClanMutation();
   const navigation = useMyNavigation();
-
+  const toast = useToast();
   const [nftImage, setNftImage] = useState<string>(
     'https://bpsdm.dephub.go.id/v2/public/file_app/struktur_image/default.png',
   );
@@ -36,9 +36,6 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
     const id = new BN(`10${new Date().getTime()}${random0To9}`);
 
     const symbol = 'LEO';
-    const image_cid = await uploadImage(nftImage);
-    const metadata_cid = await uploadMetadata(image_cid, name, description, symbol);
-    console.log('metadata_cid: ', metadata_cid);
 
     try {
       const clan = await mutateAsync({
@@ -47,17 +44,21 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
         description,
         email,
         symbol,
-        uri: `https://w3s.link/ipfs/${metadata_cid}`,
+        nftImage,
       });
       navigation.navigate(Routers.MainTabScreen);
       navigation.navigate(Routers.ClanDetailScreen, { item: clan });
+      toast.show({
+        title: 'Create clan successfully',
+        description: 'Your clan has been created successfully',
+      });
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert('Failed to create clan', error.message);
       }
       console.log('[CreateClanScreen]', 'handleCreateClan: error', error);
     }
-  }, [nftImage, name, description, mutateAsync, email, navigation]);
+  }, [nftImage, name, description, mutateAsync, email, navigation, toast]);
 
   const onPressAvatarUpload = useCallback(async () => {
     const avatarPath = await ImagePicker.openPicker({
@@ -172,6 +173,7 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
               shadow="6"
               bg="#543bd6"
               isLoading={isLoading}
+              isLoadingText="Creating..."
               py="12px"
               onPress={handleCreateClan}>
               <Text color="white" fontSize="xl">

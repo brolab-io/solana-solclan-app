@@ -75,7 +75,7 @@ export const findVaultAccount = (proposalAccount: PublicKey, proposalAuthorAccou
 
 export const findBallotAccount = (
   memberAccount: PublicKey,
-  ownerAccount: PublicKey,
+  walletAccount: PublicKey,
   proposalAccount: PublicKey,
 ) => {
   return findProgramAddressSync(
@@ -83,7 +83,7 @@ export const findBallotAccount = (
       Buffer.from('ballot'),
       proposalAccount.toBuffer(),
       memberAccount.toBuffer(),
-      ownerAccount.toBuffer(),
+      walletAccount.toBuffer(),
     ],
     SOLCLAN_PROGRAM_ID,
   )[0];
