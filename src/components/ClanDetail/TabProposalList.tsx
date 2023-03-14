@@ -26,16 +26,12 @@ const TabProposalList: React.FC<Props> = ({ item }) => {
     const filters: Parameters<typeof program.account.proposal.all>[0] = [
       {
         memcmp: {
-          offset: 8,
+          offset: 8 + 8,
           bytes: encode(clanAccount.toBuffer()),
         },
       },
     ];
-    return program.account.proposal.all(filters).then(proposals =>
-      proposals.map(proposal => {
-        return program.account.proposal.fetch(proposal.publicKey);
-      }),
-    );
+    return program.account.proposal.all(filters);
   });
 
   console.log(data);
