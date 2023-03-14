@@ -1,57 +1,69 @@
-import React, { PropsWithChildren, useCallback } from 'react';
+import React, { PropsWithChildren, useCallback, useState } from 'react';
 import { ScrollView, VStack } from 'native-base';
 import ButtonTab, { ButtonType } from '@/components/ButtonTab';
 import CardItems from '@/components/CardItems';
-import { CardItemType } from '@/components/CardItem';
 import Header from '@/components/Header';
 import Layout from '@/components/Layout';
 import { useMyNavigation } from '@/navigator/Navigation';
 import { Routers } from '@/constants/Routers';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
+import { ClanData, solClanProgramId, solClanIDL } from '@/configs/programs';
+import useProgram from '@/lib/solana/hooks/useProgram';
+import { useQuery } from '@tanstack/react-query';
+import { encode } from 'bs58';
+import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 
 const tabData: ButtonType[] = [
   {
-    label: 'My Clan',
-  },
-  {
     label: 'Explore',
   },
+  {
+    label: 'My Clan',
+  },
 ];
 
-const cardData: CardItemType[] = [
-  {
-    id: '1',
-    image:
-      'https://img.freepik.com/free-vector/gradient-liquid-abstract-background_23-2148916599.jpg?t=st=1678333832~exp=1678334432~hmac=f21042037b2f420a4a0622f622a7f471eadbb21578d453c4e5c44b9bc07bbf82',
-    title: 'Brolab & Friends',
-    author: {
-      avatar: 'https://picsum.photos/200/300',
-      name: '@LeoPham',
-    },
-    currentPrice: 100,
-  },
-  {
-    id: '2',
-    image:
-      'https://img.freepik.com/free-vector/gradient-liquid-abstract-background_23-2148916599.jpg?t=st=1678333832~exp=1678334432~hmac=f21042037b2f420a4a0622f622a7f471eadbb21578d453c4e5c44b9bc07bbf82',
-    title: 'Brolab & Friends',
-    author: {
-      avatar: 'https://picsum.photos/200/300',
-      name: '@LeoPham',
-    },
-    currentPrice: 100,
-  },
-];
 const bottomEdge: Edge[] = ['bottom'];
-const stickyHeaderIndices = [0];
 
 const HomeScreen: React.FC<PropsWithChildren> = () => {
+  const publicKey = usePublicKey();
   const { navigate } = useMyNavigation();
+  const [selectedTab, setSelectedTab] = useState(0);
 
-  const [selected, setSelected] = React.useState(0);
+  const { program } = useProgram(solClanIDL, solClanProgramId);
+  const {
+    data: clans,
+    isLoading,
+    error,
+  } = useQuery(['clans', 'all', selectedTab], async () => {
+    if (selectedTab === 0) {
+      return program.account.clan.all().then(data => data.map(item => item.account));
+    }
+
+    //
+    const filters: Parameters<typeof program.account.clan.all>[0] = [];
+    if (selectedTab === 1) {
+      if (!publicKey) {
+        return [];
+      }
+
+      const PUBLIC_KEY_SIZE = 32;
+      filters.push({
+        memcmp: {
+          offset: 8 + PUBLIC_KEY_SIZE,
+          bytes: encode(publicKey.toBuffer()),
+        },
+      });
+    }
+    const members = await program.account.member.all(filters);
+    const clanAccounts = members.map(item => item.account.clan);
+    const clanAccountsData = await Promise.all(
+      clanAccounts.map(account => program.account.clan.fetch(account)),
+    );
+    return clanAccountsData;
+  });
 
   const itemPress = useCallback(
-    (item: CardItemType) => {
+    (item: ClanData) => {
       navigate(Routers.ClanDetailScreen, { item });
     },
     [navigate],
@@ -61,11 +73,11 @@ const HomeScreen: React.FC<PropsWithChildren> = () => {
     <Layout>
       <VStack h="100%" pb="24" backgroundColor="transparent">
         <Header title="SOLCLAN" />
-        <ScrollView stickyHeaderIndices={stickyHeaderIndices}>
-          <ButtonTab mx="5" data={tabData} selected={selected} tabSelected={setSelected} />
+        <ScrollView>
+          <ButtonTab mx="5" data={tabData} selected={selectedTab} onChangeTab={setSelectedTab} />
           <SafeAreaView edges={bottomEdge}>
             <VStack px="5">
-              <CardItems data={cardData} onPress={itemPress} />
+              <CardItems data={clans} isLoading={isLoading} error={error} onPress={itemPress} />
             </VStack>
           </SafeAreaView>
         </ScrollView>

@@ -6,16 +6,19 @@ import React from 'react';
 type Props = {
   canGoBack?: boolean;
   title: string;
+  isIconTitle?: boolean;
 };
-const Header: React.FC<Props> = ({ canGoBack = false, title }: Props) => {
+const Header: React.FC<Props> = ({ canGoBack = false, title, isIconTitle = true }: Props) => {
   const { goBack } = useMyNavigation();
-  const publicKey = usePublicKey()!.toBase58();
+  const publicKey = usePublicKey()?.toBase58() || '';
   return (
     <>
       {!canGoBack ? (
         <HStack py="1" justifyContent="space-between" px="5" alignItems="flex-end">
           <HStack space="1" alignItems="center">
-            <Image source={require('../assets/sol_icon.png')} alt="solclan" w={8} h={8} />
+            {isIconTitle ? (
+              <Image source={require('../assets/sol_icon.png')} alt="solclan" w={8} h={8} />
+            ) : null}
             <Text color="white" fontSize="xl">
               {title}
             </Text>
@@ -29,7 +32,7 @@ const Header: React.FC<Props> = ({ canGoBack = false, title }: Props) => {
         </HStack>
       ) : null}
       {canGoBack ? (
-        <HStack h="20" px="5" alignItems="flex-end" justifyContent="space-between">
+        <HStack py="1" px="5" alignItems="flex-end" justifyContent="space-between">
           <Pressable onPress={goBack}>
             <Image source={require('../assets/back.png')} alt="solclan" w={8} h={8} />
           </Pressable>

@@ -17,15 +17,26 @@ import { Routers } from '../constants/Routers';
 import OnboardingScreen from '../app/onboarding/Onboarding';
 import MainTabScreen from './TabNavigation';
 import ClanDetailScreen from '@/app/home/ClanDetail';
-import { CardItemType } from '@/components/CardItem';
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
+import CreateClanScreen from '@/app/create-clan/CreateClan';
+import { ClanData, ProposalData } from '@/configs/programs';
+import ClanHistoryScreen from '@/app/clan-history/History';
+import CreateProposalScreen from '@/app/create-proposal/CreateProposal';
+import { PublicKey } from '@solana/web3.js';
 
 const AppStack = createStackNavigator<MyParamList>();
 
 type MyParamList = {
   [Routers.OnboardingScreen]: undefined;
   [Routers.MainTabScreen]: undefined;
-  [Routers.ClanDetailScreen]: { item: CardItemType };
+  [Routers.CreateClanScreen]: undefined;
+  [Routers.ClanDetailScreen]: { item: ClanData };
+  [Routers.ProfileScreen]: undefined;
+  [Routers.ClanHistoryScreen]: {
+    publicKey: PublicKey;
+    account: ProposalData;
+  };
+  [Routers.CreateProposalScreen]: { item: ClanData };
 };
 
 export const useMyRoute = <T extends keyof MyParamList>() => {
@@ -69,6 +80,27 @@ const AppRouters: MyRouteConfig[] = [
   {
     name: Routers.ClanDetailScreen,
     component: ClanDetailScreen,
+    options: {
+      headerShown: false,
+    },
+  },
+  {
+    name: Routers.CreateClanScreen,
+    component: CreateClanScreen,
+    options: {
+      headerShown: false,
+    },
+  },
+  {
+    name: Routers.ClanHistoryScreen,
+    component: ClanHistoryScreen,
+    options: {
+      headerShown: false,
+    },
+  },
+  {
+    name: Routers.CreateProposalScreen,
+    component: CreateProposalScreen,
     options: {
       headerShown: false,
     },

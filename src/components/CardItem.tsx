@@ -1,33 +1,38 @@
+import { findClanAccount } from '@/configs/pdas';
+import { ClanData } from '@/configs/programs';
+import { formatPublicKey, formatSOL } from '@/lib/solana/utils';
+import { getImage } from '@/services/Web3Storage.service';
 import { Box, HStack, Image, Pressable, Text, VStack } from 'native-base';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-type AuthorType = {
+export type AuthorType = {
   avatar: string;
   name: string;
 };
 
-export type CardItemType = {
-  id: string;
-  image: string;
-  title: string;
-  author: AuthorType;
-  currentPrice: number;
+export type CardItemProps = {
+  item: ClanData;
   onPress?: () => void;
 };
-const CardItem: React.FC<CardItemType> = ({
-  image,
-  title,
-  author,
-  currentPrice,
-  onPress,
-}: CardItemType) => {
+const CardItem: React.FC<CardItemProps> = ({ onPress, item }: CardItemProps) => {
+  const [image, setImage] = useState<string>('https://picsum.photos/200/300');
+
+  useEffect(() => {
+    getImage(item.uri).then(res => {
+      setImage(res.image);
+    });
+  }, [item.uri]);
+
   return (
     <Pressable onPress={onPress}>
       <VStack borderRadius={24} overflow="hidden" pb="3" backgroundColor="#252939">
-        <Image src={image} alt={title} w="100%" h={200} resizeMode="cover" />
+        <Image src={image} alt={item.name} w="100%" h={200} resizeMode="cover" />
         <Box m="3" borderBottomColor="#7C87B1" borderBottomWidth="1" pb="2">
-          <Text color="white" fontSize="xl">
-            {title}
+          <Text color="white" fontSize="2xl">
+            {item.name || 'No Name'}
+          </Text>
+          <Text color="#aaa" fontSize="xs">
+            {formatPublicKey(findClanAccount(item.id))} (#{item.id.toString()})
           </Text>
         </Box>
         <HStack justifyContent="space-around">
@@ -36,9 +41,15 @@ const CardItem: React.FC<CardItemType> = ({
               Founder
             </Text>
             <HStack alignItems="center" space="2">
-              <Image src={author.avatar} alt={author.name} w={10} h={10} borderRadius="full" />
+              <Image
+                src="https://picsum.photos/200/300"
+                alt={formatPublicKey(item.creator)}
+                w={10}
+                h={10}
+                borderRadius="full"
+              />
               <Text color="white" fontSize="md">
-                {author.name}
+                {formatPublicKey(item.creator)}
               </Text>
             </HStack>
           </VStack>
@@ -49,13 +60,13 @@ const CardItem: React.FC<CardItemType> = ({
             <HStack alignItems="center" space="2" justifyContent="flex-end">
               <Image
                 source={require('../assets/sol_balance.png')}
-                alt={author.name}
+                alt="Sol Icon"
                 w={6}
                 h={6}
                 borderRadius="full"
               />
               <Text color="white" fontSize="md">
-                {currentPrice} SOL
+                {formatSOL(item.power)} SOL
               </Text>
             </HStack>
           </VStack>

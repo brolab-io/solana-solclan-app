@@ -3,17 +3,23 @@ import { Routers } from '@/constants/Routers';
 import useConnect from '@/lib/solana/hooks/useConnect';
 import { useMyNavigation } from '@/navigator/Navigation';
 import { BlurView } from '@react-native-community/blur';
-import { Box, Image, Text, VStack } from 'native-base';
+import { Box, Image, Text, VStack, Button as NativeBaseButton } from 'native-base';
 import React, { PropsWithChildren, useCallback, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 
 import background from '../../assets/background.png';
 import solIcon from '../../assets/sol_icon.png';
+import phantomIcon from '../../assets/icons/phantom_128x128.png';
+import ButtonImageIcon from '@/components/ButtonImageIcon';
 
 const OnboardingScreen: React.FC<PropsWithChildren> = () => {
   const { navigate } = useMyNavigation();
-  const { connect, isConnected, publicKey } = useConnect();
-  const letsPress = useCallback(() => {
+  const { connect, isConnected, publicKey, isConnecting } = useConnect();
+  const handlePressExplore = useCallback(() => {
+    navigate(Routers.MainTabScreen);
+  }, [navigate]);
+
+  const handlePressConnect = useCallback(() => {
     connect();
   }, [connect]);
 
@@ -68,11 +74,30 @@ const OnboardingScreen: React.FC<PropsWithChildren> = () => {
           <Text color="white" fontSize="3xl" fontWeight="bold" mt="5">
             Invest with a community, not just a platform
           </Text>
-          <Button mb="5" onPress={letsPress}>
-            <Text color="white" fontSize="xl">
-              Let's Explore! 🔥
-            </Text>
-          </Button>
+          <VStack mb="6" width="full" space="4">
+            <NativeBaseButton
+              shadow="6"
+              py="12px"
+              rounded="full"
+              bg="#215BF0"
+              onPress={handlePressExplore}>
+              <Text color="white" fontSize="xl">
+                Let's Explore! 🔥
+              </Text>
+            </NativeBaseButton>
+            <NativeBaseButton
+              rounded="full"
+              shadow="6"
+              bg="#543bd6"
+              leftIcon={<ButtonImageIcon h="28px" w="28px" source={phantomIcon} alt="phantom" />}
+              isLoading={isConnecting}
+              py="12px"
+              onPress={handlePressConnect}>
+              <Text color="white" fontSize="xl">
+                Connect Wallet
+              </Text>
+            </NativeBaseButton>
+          </VStack>
         </VStack>
       </Box>
     </Box>
