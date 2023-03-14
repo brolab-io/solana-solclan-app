@@ -3,12 +3,28 @@ import Layout from '@/components/Layout';
 import MyClanItems from '@/components/MyClanItems';
 import UserInfo from '@/components/UserInfo';
 import { Routers } from '@/constants/Routers';
+import useProgram from '@/lib/solana/hooks/useProgram';
+import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import { useMyNavigation } from '@/navigator/Navigation';
-import { ScrollView, VStack } from 'native-base';
+import { Box, ScrollView, VStack } from 'native-base';
 import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
+import { ClanData, solClanProgramId, solClanIDL } from '@/configs/programs';
+import { useQuery } from '@tanstack/react-query';
+import { encode } from 'bs58';
+import ButtonTab, { ButtonType } from '@/components/ButtonTab';
+import TabProposalListItems from '@/components/ClanDetail/TabProposalListItems';
 
 const bottomEdge: Edge[] = ['bottom'];
+
+const tabData: ButtonType[] = [
+  {
+    label: 'Clans',
+  },
+  {
+    label: 'Proposal',
+  },
+];
 
 const userData = {
   avatar:
@@ -21,35 +37,60 @@ const userData = {
   description: 'Hello world I’m a Hot boyz, I’m from Viet Nam and love to invest on a good stuff',
 };
 
-const clanItems = [
-  {
-    id: '123123123',
-    isNew: true,
-    image:
-      'https://img.freepik.com/free-vector/gradient-liquid-abstract-background_23-2148916599.jpg?t=st=1678333832~exp=1678334432~hmac=f21042037b2f420a4a0622f622a7f471eadbb21578d453c4e5c44b9bc07bbf82',
-  },
-  {
-    id: '1231231ewr23',
-    isNew: false,
-    image:
-      'https://img.freepik.com/free-vector/gradient-liquid-abstract-background_23-2148916599.jpg?t=st=1678333832~exp=1678334432~hmac=f21042037b2f420a4a0622f622a7f471eadbb21578d453c4e5c44b9bc07bbf82',
-  },
-];
-
 const ProfileScreen: React.FC<PropsWithChildren> = () => {
   const { navigate } = useMyNavigation();
+  const publicKey = usePublicKey();
+  const { program } = useProgram(solClanIDL, solClanProgramId);
 
   const [tabselected, setTabSelected] = useState(0);
+  const [clansData, setClansData] = useState<ClanData[]>([]);
+
+  const { data: clans } = useQuery(['clans', 'owner'], async () => {
+    const U64_SIZE = 8;
+    if (publicKey === null) {
+      return [];
+    }
+
+    return program.account.clan
+      .all([
+        {
+          memcmp: {
+            offset: 8 + U64_SIZE,
+            bytes: encode(publicKey.toBuffer()),
+          },
+        },
+      ])
+      .then(data => data.map(item => item.account));
+  });
+
+  const {
+    data: proposals,
+    error,
+    isLoading,
+  } = useQuery(['proposal', 'owner'], async () => {
+    const U64_SIZE = 8;
+    const PUBLICKEY_SIZE = 32;
+    if (publicKey === null) {
+      return [];
+    }
+
+    return program.account.proposal.all([
+      {
+        memcmp: {
+          offset: 8 + U64_SIZE + PUBLICKEY_SIZE,
+          bytes: encode(publicKey.toBuffer()),
+        },
+      },
+    ]);
+  });
 
   useEffect(() => {
-    //Get data Clan or Proposal
-    console.log('tabselected', tabselected);
-  }, [tabselected]);
+    setClansData(clans || []);
+  }, [clans]);
 
   const onItemPress = useCallback(
-    (id: string) => {
-      console.log('id', id);
-      navigate(Routers.ClanHistoryScreen);
+    (clan: ClanData) => {
+      navigate(Routers.ClanDetailScreen, { item: clan });
     },
     [navigate],
   );
@@ -61,12 +102,36 @@ const ProfileScreen: React.FC<PropsWithChildren> = () => {
         <ScrollView>
           <SafeAreaView edges={bottomEdge}>
             <UserInfo data={userData} />
-            <MyClanItems
-              clanItems={clanItems}
-              tabSelected={tabselected}
-              onTabSelected={setTabSelected}
-              onItemPress={onItemPress}
-            />
+            <VStack alignItems="center" justifyContent="center">
+              <ButtonTab
+                w="50%"
+                borderRadius="full"
+                borderColor="#4C5172"
+                borderWidth="1"
+                p="1"
+                justifyContent="space-between"
+                data={tabData}
+                selected={tabselected}
+                onChangeTab={setTabSelected}
+              />
+              <Box w="100%" h="1" px="5">
+                <Box borderTopColor="#4C5172" borderTopWidth="1" w="100%" />
+              </Box>
+            </VStack>
+
+            {tabselected === 0 ? (
+              <MyClanItems clanItems={clansData} onItemPress={onItemPress} />
+            ) : null}
+
+            {tabselected === 1 ? (
+              <Box px="5">
+                <TabProposalListItems
+                  error={error}
+                  isLoading={isLoading}
+                  proposalAccounts={proposals}
+                />
+              </Box>
+            ) : null}
           </SafeAreaView>
         </ScrollView>
       </VStack>
