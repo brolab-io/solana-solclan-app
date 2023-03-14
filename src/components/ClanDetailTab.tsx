@@ -5,15 +5,25 @@ import DepositActionSheet from './DepositActionSheet';
 import { ClanData } from '@/configs/programs';
 import { formatSOL } from '@/lib/solana/utils';
 import TabProposalList from './ClanDetail/TabProposalList';
+import TabMemberList from './ClanDetail/TabMemberList';
+import { PublicKey } from '@solana/web3.js';
 
 type Props = {
   tabselected: number;
   isLoading: boolean;
   hasJoined: boolean;
   item: ClanData;
+  clanPublicKey: PublicKey | null;
   onJoinOrDeposit: () => void;
 };
-const ClanDetailTab = ({ tabselected, isLoading, hasJoined, item, onJoinOrDeposit }: Props) => {
+const ClanDetailTab = ({
+  tabselected,
+  isLoading,
+  hasJoined,
+  item,
+  clanPublicKey,
+  onJoinOrDeposit,
+}: Props) => {
   return (
     <VStack>
       {tabselected === 0 ? (
@@ -63,51 +73,7 @@ const ClanDetailTab = ({ tabselected, isLoading, hasJoined, item, onJoinOrDeposi
           </NativeBaseButton>
         </VStack>
       ) : null}
-      {tabselected === 1 ? (
-        <VStack>
-          <HStack justifyContent="space-between">
-            <VStack>
-              <Text color="#9498AA" fontSize="md">
-                Name
-              </Text>
-              <HStack alignItems="flex-end" space="1">
-                <Image
-                  source={require('../assets/sol_balance.png')}
-                  alt="sol_balance"
-                  w={8}
-                  h={8}
-                  borderRadius="full"
-                />
-                <Text color="white" fontSize="xs">
-                  @henry
-                </Text>
-              </HStack>
-            </VStack>
-
-            <VStack justifyContent="space-between">
-              <Text color="#9498AA" fontSize="md">
-                Day Joined
-              </Text>
-              <HStack alignItems="center" justifyContent="flex-end">
-                <Text color="white" fontSize="xs">
-                  March 8, 2023 at 10:18 pm
-                </Text>
-              </HStack>
-            </VStack>
-
-            <VStack justifyContent="space-between">
-              <Text color="#9498AA" fontSize="md">
-                Vote Power
-              </Text>
-              <HStack justifyContent="flex-end">
-                <Text color="white" fontSize="xs">
-                  22
-                </Text>
-              </HStack>
-            </VStack>
-          </HStack>
-        </VStack>
-      ) : null}
+      {tabselected === 1 ? <TabMemberList item={item} clanPublicKey={clanPublicKey} /> : null}
       {tabselected === 2 ? (
         <HStack alignItems="center" space="3">
           <Image
