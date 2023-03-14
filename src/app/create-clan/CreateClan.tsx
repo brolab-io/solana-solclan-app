@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback, useState, useEffect } from 'react';
+import React, { PropsWithChildren, useCallback, useState } from 'react';
 import { Alert } from 'react-native';
 import {
   Box,
@@ -18,17 +18,7 @@ import useCreateClanMutation from '@/hooks/mutations/useCreateClanMutation';
 import { useMyNavigation } from '@/navigator/Navigation';
 import { Routers } from '@/constants/Routers';
 import ImagePicker from 'react-native-image-crop-picker';
-import axios from 'axios';
-import { File } from 'buffer';
-
-type ImageUpdate = {
-  uri: string;
-  type: string;
-  name: string;
-};
-
-const token =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDIzQzNBOUZENEY2QUM2YTBlRTAzZjU4YkZiMDZFNDU1MWVjNGZmMDEiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Nzg3MDU3NjQ1NjQsIm5hbWUiOiJzb2xjbGFuIn0.Jto6InvwCEpKmK13r3c_FlDZxfbZeIpA34e5e-NYdjM';
+import { uploadImage, uploadMetadata } from '@/services/Web3Storage.service';
 
 const CreateClanScreen: React.FC<PropsWithChildren> = () => {
   const [name, setName] = useState('Feng Shui');
@@ -37,61 +27,17 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
   const { mutateAsync, isLoading } = useCreateClanMutation();
   const navigation = useMyNavigation();
 
-  const [nftImage, setNftImage] = useState<ImageUpdate>({
-    uri: 'https://picsum.photos/200/300',
-    type: 'image/jpeg',
-    name: 'NFT',
-  });
-
-  const uploadMetadata = useCallback(async () => {
-    const formData = new FormData();
-    formData.append('file', nftImage);
-
-    const imageResponse = await axios.post('https://api.web3.storage/upload', formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    const { cid } = imageResponse.data;
-    const imageURL = `https://w3s.link/ipfs/${cid}`;
-
-    const metadata = {
-      name: 'NFT',
-      description: 'NFT',
-      uri: imageURL,
-    };
-
-    console.log('metadata', metadata);
-
-    // Create a blob of the metadata
-    const blob = new Blob([JSON.stringify(metadata)], {
-      type: 'text/plain',
-      lastModified: new Date().getTime(),
-    });
-    console.log('blob', blob);
-    const metadataFormData = new FormData();
-    const arrayBuffer = await blob.arrayBuffer();
-    console.log(arrayBuffer.byteLength);
-
-    // metadataFormData.append('file', file);
-    // const metadataResponse = await axios.post('https://api.web3.storage/upload', metadataFormData, {
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //     'Content-Type': 'multipart/form-data',
-    //   },
-    // });
-    // console.log(metadataResponse.data);
-    // const { cid: metadataCid } = metadataResponse.data;
-    // return `https://w3s.link/ipfs/${metadataCid}`;
-  }, [nftImage]);
+  const [nftImage, setNftImage] = useState<string>(
+    'https://bpsdm.dephub.go.id/v2/public/file_app/struktur_image/default.png',
+  );
 
   const handleCreateClan = useCallback(async () => {
     const random0To9 = Math.floor(Math.random() * 10);
     const id = new BN(`10${new Date().getTime()}${random0To9}`);
 
-    uploadMetadata();
-    return;
+    const image_cid = await uploadImage(nftImage);
+    const metadata_cid = await uploadMetadata(image_cid, name, description, 'LEOPHAM');
+    console.log('metadata_cid: ', metadata_cid);
     try {
       const clan = await mutateAsync({
         id,
@@ -107,12 +53,10 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
       }
       console.log('[CreateClanScreen]', 'handleCreateClan: error', error);
     }
-  }, [uploadMetadata, mutateAsync, name, description, email, navigation]);
+  }, [nftImage, name, description, mutateAsync, email, navigation]);
 
   const onPressAvatarUpload = useCallback(async () => {
     const avatarPath = await ImagePicker.openPicker({
-      // width: 100,
-      // height: 100,
       cropping: true,
       multiple: false,
       mediaType: 'photo',
@@ -125,13 +69,7 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
     if (!avatarPath) {
       return;
     }
-
-    var photo: ImageUpdate = {
-      uri: avatarPath.path,
-      type: 'image/jpeg',
-      name: 'image.jpg',
-    };
-    setNftImage(photo);
+    setNftImage(avatarPath.path);
   }, []);
 
   return (
@@ -144,7 +82,7 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
               <Image
                 style={styles.clanImage}
                 alt="Upload Image"
-                source={{ uri: nftImage.uri }}
+                source={{ uri: nftImage }}
                 flex="1"
               />
               <VStack flex="2" space="3">
