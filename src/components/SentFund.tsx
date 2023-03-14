@@ -1,13 +1,41 @@
+import { ProposalData, solClanIDL, solClanProgramId } from '@/configs/programs';
+import useProgram from '@/lib/solana/hooks/useProgram';
+import { formatPublicKey } from '@/lib/solana/utils';
+import { PublicKey } from '@solana/web3.js';
+import { useQuery } from '@tanstack/react-query';
+import { encode } from 'bs58';
 import { Box, HStack, Image, Text, VStack } from 'native-base';
 import React, { PropsWithChildren } from 'react';
 import Button from './Button';
 
 type Props = {
+  proposalAccount: PublicKey;
+  proposal: ProposalData;
   onVoteForPress?: () => void;
   onVoteAgainstPress?: () => void;
 };
 
-const SentFund: React.FC<PropsWithChildren<Props>> = ({ onVoteForPress, onVoteAgainstPress }) => {
+const SentFund: React.FC<PropsWithChildren<Props>> = ({
+  onVoteForPress,
+  onVoteAgainstPress,
+  proposalAccount,
+  proposal,
+}) => {
+  const { program } = useProgram(solClanIDL, solClanProgramId);
+  const { data: voteCount } = useQuery(
+    ['proposals', 'vote-count', proposalAccount.toBase58()],
+    async () => {
+      const filters: Parameters<typeof program.account.ballot.all>[0] = [
+        {
+          memcmp: {
+            offset: 8,
+            bytes: encode(proposalAccount.toBuffer()),
+          },
+        },
+      ];
+      return program.account.ballot.all(filters).then(ballots => ballots.length);
+    },
+  );
   return (
     <VStack pt="2" space="3">
       <Text color="white" fontSize="md">
@@ -27,7 +55,7 @@ const SentFund: React.FC<PropsWithChildren<Props>> = ({ onVoteForPress, onVoteAg
         </Button>
         <Button w="20%" backgroundColor="#4A5568" rounded="14" py="1">
           <Text color="white" fontSize="md" fontWeight="bold">
-            058
+            {(voteCount || 0).toString().padStart(3, '0')}
           </Text>
         </Button>
         <Box w="1%" my="1" borderLeftColor="#4A5568" borderLeftWidth="1">
@@ -58,7 +86,7 @@ const SentFund: React.FC<PropsWithChildren<Props>> = ({ onVoteForPress, onVoteAg
         />
         <VStack>
           <Text color="#4299E1" fontSize="md">
-            0fx247sb784cvb2....qg8472bva
+            {formatPublicKey(proposal.author, 8)}
           </Text>
           <Text color="white" fontSize="md">
             Created 12:30 A.M 9/9/2021

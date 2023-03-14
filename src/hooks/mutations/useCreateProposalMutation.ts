@@ -43,25 +43,10 @@ const useCreateProposalMutation = () => {
     const memberAccount = findClanMemberAccount(clanAccount, publicKey);
     const proposalAccount = findProposalAccount(payload.proposalId, clanAccount, publicKey);
 
-    console.log(`clanAccount: ${clanAccount.toBase58()}`);
-    console.log(`memberAccount: ${memberAccount.toBase58()}`);
-    console.log(`proposalAccount: ${proposalAccount.toBase58()}`);
-
     // const proposalAccountData = await program.account.proposal.fetch(proposalAccount);
     const vaultAccount = findVaultAccount(proposalAccount, publicKey);
 
     // console.log(`proposalAccountData: ${JSON.stringify(proposalAccountData)}`);
-    console.log(`vaultAccount: ${vaultAccount.toBase58()}`);
-
-    console.log(
-      'payload',
-      payload.proposalId,
-      payload.title,
-      payload.description,
-      payload.startAt,
-      payload.endAt,
-      payload.amount,
-    );
 
     const tx = await program.methods
       .createProposal(
