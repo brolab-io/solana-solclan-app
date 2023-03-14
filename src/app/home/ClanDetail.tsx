@@ -17,6 +17,7 @@ import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import { useQuery } from '@tanstack/react-query';
 import useJoinClanMutation from '@/hooks/mutations/useJoinClanMutation';
 import { checkIsMemberOfClan } from '@/lib/solana/utils';
+import { PublicKey } from '@solana/web3.js';
 
 const tabData: ButtonType[] = [
   {
@@ -38,6 +39,7 @@ const bottomEdge: Edge[] = ['bottom'];
 const ClanDetail: React.FC<PropsWithChildren> = () => {
   const [selected, setSelected] = useState(0);
   const publicKey = usePublicKey();
+  const [clanPublicKey, setClanPublicKey] = useState<PublicKey | null>(null);
   const { program } = useProgram(solClanIDL, solClanProgramId);
   const {
     params: { item: clanFromRoute },
@@ -47,6 +49,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
     ['clan', clanFromRoute.id.toString()],
     async () => {
       const clanAccount = findClanAccount(clanFromRoute.id);
+      setClanPublicKey(clanAccount);
       return program.account.clan.fetch(clanAccount);
     },
     {
@@ -111,6 +114,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
                 hasJoined={hasJoined}
                 tabselected={selected}
                 item={clan}
+                clanPublicKey={clanPublicKey}
                 onJoinOrDeposit={onJoinOrDeposit}
               />
             </VStack>
