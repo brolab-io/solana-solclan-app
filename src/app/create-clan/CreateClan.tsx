@@ -17,6 +17,8 @@ import { BN } from '@project-serum/anchor';
 import useCreateClanMutation from '@/hooks/mutations/useCreateClanMutation';
 import { useMyNavigation } from '@/navigator/Navigation';
 import { Routers } from '@/constants/Routers';
+import ImagePicker from 'react-native-image-crop-picker';
+import { uploadImage, uploadMetadata } from '@/services/Web3Storage.service';
 
 const CreateClanScreen: React.FC<PropsWithChildren> = () => {
   const [name, setName] = useState('Feng Shui');
@@ -25,9 +27,18 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
   const { mutateAsync, isLoading } = useCreateClanMutation();
   const navigation = useMyNavigation();
 
+  const [nftImage, setNftImage] = useState<string>(
+    'https://bpsdm.dephub.go.id/v2/public/file_app/struktur_image/default.png',
+  );
+
   const handleCreateClan = useCallback(async () => {
     const random0To9 = Math.floor(Math.random() * 10);
     const id = new BN(`10${new Date().getTime()}${random0To9}`);
+
+    const symbol = 'LEO';
+    const image_cid = await uploadImage(nftImage);
+    const metadata_cid = await uploadMetadata(image_cid, name, description, symbol);
+    console.log('metadata_cid: ', metadata_cid);
 
     try {
       const clan = await mutateAsync({
@@ -35,6 +46,8 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
         name,
         description,
         email,
+        symbol,
+        uri: `https://w3s.link/ipfs/${metadata_cid}`,
       });
       navigation.navigate(Routers.MainTabScreen);
       navigation.navigate(Routers.ClanDetailScreen, { item: clan });
@@ -44,7 +57,24 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
       }
       console.log('[CreateClanScreen]', 'handleCreateClan: error', error);
     }
-  }, [mutateAsync, name, description, email, navigation]);
+  }, [nftImage, name, description, mutateAsync, email, navigation]);
+
+  const onPressAvatarUpload = useCallback(async () => {
+    const avatarPath = await ImagePicker.openPicker({
+      cropping: true,
+      multiple: false,
+      mediaType: 'photo',
+      cropperCircleOverlay: true,
+      compressImageQuality: 1,
+    }).catch(err => {
+      console.log('Avatar cancel: ', err);
+    });
+
+    if (!avatarPath) {
+      return;
+    }
+    setNftImage(avatarPath.path);
+  }, []);
 
   return (
     <Layout>
@@ -56,12 +86,13 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
               <Image
                 style={styles.clanImage}
                 alt="Upload Image"
-                source={{ uri: 'https://picsum.photos/200/300' }}
+                source={{ uri: nftImage }}
                 flex="1"
               />
               <VStack flex="2" space="3">
                 <Box>
                   <Button
+                    onPress={onPressAvatarUpload}
                     width="142px"
                     bgColor="transparent"
                     padding={0}

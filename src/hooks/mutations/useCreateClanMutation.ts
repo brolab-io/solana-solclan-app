@@ -30,6 +30,8 @@ type Payload = {
   name: string;
   email: string;
   description: string;
+  uri: string;
+  symbol: string;
 };
 
 const useCreateClanMutation = () => {
@@ -51,12 +53,7 @@ const useCreateClanMutation = () => {
     const masterEditionAccount = findMasterEditionAccount(cardAccount);
 
     const tx = await program.methods
-      .createClan(
-        payload.id,
-        payload.name,
-        'TEST',
-        'https://arweave.net/HK4OdYYja7UJRpc3Iw0VYCFiqkAMNi0tbFKr42Qgcjc',
-      )
+      .createClan(payload.id, payload.name, payload.symbol, payload.uri)
       .accounts({
         clan: clanAccount,
         member: memberAccount,
