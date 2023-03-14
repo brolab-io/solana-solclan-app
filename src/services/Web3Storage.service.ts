@@ -75,3 +75,13 @@ export const uploadImage = async (imageUrl: string) => {
   const { cid } = imageResponse.data;
   return cid;
 };
+
+export const getImage = async (imageUrl: string) => {
+  const imageResponse = await axios.get(imageUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return imageResponse.data;
+};
