@@ -1,13 +1,41 @@
 import usePublicKey from '@/lib/solana/hooks/usePublicKey';
 import { formatPublicKey } from '@/lib/solana/utils';
+import { useQuery } from '@tanstack/react-query';
 import { Box, HStack, Image, Text, VStack } from 'native-base';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useMemo } from 'react';
+import { solClanProgramId, solClanIDL, ProposalData } from '@/configs/programs';
+import useProgram from '@/lib/solana/hooks/useProgram';
+import { encode } from 'bs58';
+import { ProgramAccount } from '@project-serum/anchor';
 
 type Props = {
   data: any;
+  proposals?: ProgramAccount<ProposalData>[];
 };
-const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data }) => {
+const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data, proposals }) => {
   const publicKey = usePublicKey();
+  const { program } = useProgram(solClanIDL, solClanProgramId);
+
+  const { data: itMe } = useQuery(['members', 'my-clan-join'], async () => {
+    const PUBLICKEY_SIZE = 32;
+    if (publicKey === null) {
+      return [];
+    }
+
+    return program.account.member.all([
+      {
+        memcmp: {
+          offset: 8 + PUBLICKEY_SIZE,
+          bytes: encode(publicKey.toBuffer()),
+        },
+      },
+    ]);
+  });
+
+  const totalDeposit = useMemo(() => {
+    return itMe?.reduce((acc, item) => acc + item.account.power, 0);
+  }, [itMe]);
+
   return (
     <VStack px="5" mt="10" space="5">
       <HStack space="5" alignItems="center">
@@ -25,7 +53,7 @@ const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data }) => {
       <HStack justifyContent="space-between">
         <VStack justifyContent="center" alignItems="center" w="25%">
           <Text color="white" fontSize="xl">
-            {data.clan_number}
+            {itMe?.length}
           </Text>
           <Text color="white" fontSize="md">
             Clan
@@ -39,7 +67,7 @@ const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data }) => {
           w="50%"
           borderColor="#4C5172">
           <Text color="white" fontSize="xl">
-            {data.deposit}
+            {totalDeposit}
           </Text>
           <Text color="white" fontSize="md">
             Total Deposit
@@ -47,7 +75,7 @@ const UserInfo: React.FC<PropsWithChildren<Props>> = ({ data }) => {
         </VStack>
         <VStack alignItems="center" w="25%">
           <Text color="white" fontSize="xl">
-            {data.proposal}
+            {proposals?.length || 0}
           </Text>
           <Text color="white" fontSize="md">
             Proposal
