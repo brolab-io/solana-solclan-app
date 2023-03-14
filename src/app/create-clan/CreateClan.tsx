@@ -35,15 +35,19 @@ const CreateClanScreen: React.FC<PropsWithChildren> = () => {
     const random0To9 = Math.floor(Math.random() * 10);
     const id = new BN(`10${new Date().getTime()}${random0To9}`);
 
+    const symbol = 'LEO';
     const image_cid = await uploadImage(nftImage);
-    const metadata_cid = await uploadMetadata(image_cid, name, description, 'LEOPHAM');
+    const metadata_cid = await uploadMetadata(image_cid, name, description, symbol);
     console.log('metadata_cid: ', metadata_cid);
+
     try {
       const clan = await mutateAsync({
         id,
         name,
         description,
         email,
+        symbol,
+        uri: `https://w3s.link/ipfs/${metadata_cid}`,
       });
       navigation.navigate(Routers.MainTabScreen);
       navigation.navigate(Routers.ClanDetailScreen, { item: clan });
