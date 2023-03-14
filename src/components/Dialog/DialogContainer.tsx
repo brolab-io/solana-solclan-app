@@ -1,4 +1,4 @@
-import { AlertDialog } from 'native-base';
+import { AlertDialog, Text } from 'native-base';
 import React, { useCallback, useRef, useState, createRef, useImperativeHandle } from 'react';
 
 type DialogData = {
@@ -17,8 +17,8 @@ export const ref = createRef<{
 const DialogContainer = () => {
   const [isOpen, setOpen] = useState(false);
   const dialogDataRef = useRef<DialogData>({
-    title: '',
-    content: '',
+    title: 'This is title',
+    content: 'This is content',
   });
 
   const cancelRef = useRef(null);
@@ -40,9 +40,17 @@ const DialogContainer = () => {
   );
 
   return (
-    <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
+    <AlertDialog
+      leastDestructiveRef={cancelRef}
+      isOpen={isOpen}
+      onClose={onClose}
+      backgroundColor="#000000a0">
       <AlertDialog.Content>
-        <AlertDialog.Body bg="#1A202C">{dialogDataRef.current.content}</AlertDialog.Body>
+        <AlertDialog.Body bg="#1A202C">
+          <Text color="white" fontSize="lg">
+            {dialogDataRef.current.content}
+          </Text>
+        </AlertDialog.Body>
       </AlertDialog.Content>
     </AlertDialog>
   );

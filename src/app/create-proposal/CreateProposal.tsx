@@ -1,7 +1,7 @@
 import Header from '@/components/Header';
 import MyInput from '@/components/Input';
 import Layout from '@/components/Layout';
-import { Box, Button, HStack, ScrollView, Text, VStack } from 'native-base';
+import { Box, Button, HStack, ScrollView, Text, useToast, VStack } from 'native-base';
 import React, { useCallback } from 'react';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 import calen_icon from '@/assets/calen_icon.png';
@@ -13,7 +13,6 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getMutationMessage } from '@/lib/solana/utils';
 import { solClanIDL } from '@/configs/programs';
 import { Alert } from 'react-native';
-import { showDialog } from '@/components/Dialog';
 import { queryClient } from '@/configs/query.client';
 
 const edges: Edge[] = ['bottom'];
@@ -31,7 +30,7 @@ const CreateProposal: React.FC = () => {
   const [amount, setAmount] = React.useState<string>('');
   const [startTime, setStartTime] = React.useState<Date>(new Date());
   const [endTime, setEndTime] = React.useState<Date>(new Date());
-
+  const toast = useToast();
   const handleCreateProposal = useCallback(async () => {
     const random0To9 = Math.floor(Math.random() * 10);
     const proposalId = new BN(`10${new Date().getTime()}${random0To9}`);
@@ -47,14 +46,15 @@ const CreateProposal: React.FC = () => {
       });
       queryClient.invalidateQueries(['proposals', item.id.toString(), 'all']);
       goBack();
-      showDialog({
+
+      toast.show({
         title: 'Create proposal successfully',
-        content: 'Your proposal has been created successfully',
+        description: 'Your proposal has been created successfully',
       });
     } catch (error) {
       Alert.alert('Failed to create proposal', getMutationMessage(error, solClanIDL));
     }
-  }, [amount, description, endTime, goBack, item.id, mutateAsync, startTime, title]);
+  }, [amount, description, endTime, goBack, item.id, mutateAsync, startTime, title, toast]);
 
   return (
     <Layout>

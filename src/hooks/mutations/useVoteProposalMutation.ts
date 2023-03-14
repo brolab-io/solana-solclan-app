@@ -30,7 +30,7 @@ const useVoteProposalMutation = () => {
     const proposal = await program.account.proposal.fetch(payload.proposalPubkey);
     const clanAccount = proposal.clan;
     const memberAccount = findClanMemberAccount(clanAccount, publicKey);
-    const ballotAccount = findBallotAccount(publicKey, memberAccount, payload.proposalPubkey);
+    const ballotAccount = findBallotAccount(memberAccount, publicKey, payload.proposalPubkey);
 
     const tx = await program.methods
       .vote(payload.vote)

@@ -4,7 +4,7 @@ import ClanDetailTab from '@/components/ClanDetailTab';
 import ClanDetailItem from '@/components/ClanDetailItem';
 import Header from '@/components/Header';
 import Layout from '@/components/Layout';
-import { ScrollView, VStack } from 'native-base';
+import { ScrollView, useToast, VStack } from 'native-base';
 import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 import { SheetManager } from 'react-native-actions-sheet';
 import { ACTION_SHEET } from '@/constants/ActionSheet';
@@ -65,7 +65,7 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
     }
     return findClanAccount(clan.id);
   }, [clan.id, publicKey]);
-
+  const toast = useToast();
   const {
     data: member,
     isLoading: isLoadingMember,
@@ -88,8 +88,12 @@ const ClanDetail: React.FC<PropsWithChildren> = () => {
         id: clan.id,
       });
       await refetchMember();
+      toast.show({
+        title: 'Success',
+        description: 'You have joined the clan',
+      });
     }
-  }, [hasJoined, clan.id, joinClan, refetchMember]);
+  }, [hasJoined, joinClan, clan.id, refetchMember, toast]);
 
   return (
     <Layout>

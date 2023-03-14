@@ -15,6 +15,7 @@ import {
   modifyComputeUnits,
   waitForTransactionSignatureConfirmation,
 } from '@/lib/solana/utils';
+import { uploadImage, uploadMetadata } from '@/services/Web3Storage.service';
 import { PROGRAM_ADDRESS } from '@metaplex-foundation/mpl-token-metadata/dist/src/generated';
 import { BN } from '@project-serum/anchor';
 import {
@@ -30,8 +31,9 @@ type Payload = {
   name: string;
   email: string;
   description: string;
-  uri: string;
+  uri?: string;
   symbol: string;
+  nftImage: any;
 };
 
 const useCreateClanMutation = () => {
@@ -44,7 +46,11 @@ const useCreateClanMutation = () => {
     if (!publicKey) {
       return Promise.reject('Please connect your wallet');
     }
-    // payload.id = new BN('112233');
+
+    const image_cid = await uploadImage(payload.nftImage);
+    const metadata_cid = await uploadMetadata(image_cid, payload.name, '', payload.symbol);
+    payload.uri = `https://w3s.link/ipfs/${metadata_cid}`;
+
     const clanAccount = findClanAccount(payload.id);
     const memberAccount = findClanMemberAccount(clanAccount, publicKey);
     const cardAccount = findClanCardAccount(clanAccount, publicKey);
